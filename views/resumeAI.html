@@ -1,0 +1,1363 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resume AI - Aiulabs.io</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/332cfc7815.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const templateId = urlParams.get('templateId');
+        
+            if (templateId) {
+                loadTemplateContent(templateId); // Load specific template content using its ID
+            }
+        });
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_green.css">
+    <link rel="stylesheet" type="text/css" href="/views/css/resume.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://kit.fontawesome.com/332cfc7815.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+        body {
+            background: #333144;
+            margin: 0 auto;
+        }
+        page {
+            width: 21cm;
+            height: 29.7cm;
+            background: white;
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0.5cm;
+            position: relative;
+            box-sizing: border-box; /* Ensures padding doesn't increase element size */
+            padding-left: 10mm; /* Initial padding */
+            padding-right: 10mm; /* Initial padding */
+            padding-top: 10mm;
+            overflow: hidden; /* Hide overflow content */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .draggable {
+            width: 100%;
+            height: 85vh;
+            display: flex;
+            padding-top: 100px;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        /* Webkit browsers (Chrome, Safari, Edge) */
+        .draggable::-webkit-scrollbar {
+            width: 2px; /* Width of the scrollbar */
+            height: 0; /* Height for horizontal scrollbars (if any) */
+        }
+        .draggable::-webkit-scrollbar-track {
+            background: #f0f0f0; /* Track color */
+        }
+        .draggable::-webkit-scrollbar-thumb {
+            background-color: #ffffff; /* Scrollbar thumb color */
+            border-radius: 10px;
+        }
+        /* Firefox */
+        .draggable {
+            scrollbar-width: thin; /* Make the scrollbar thin */
+            scrollbar-color: #b3b3b3 #f0f0f0; /* Thumb color | Track color */
+        }
+        page[size="A4"] {  
+            width: 21cm;
+            height: 29.7cm; 
+        }
+        @page {
+            size: 21cm 29.7cm;
+            margin: 0mm;
+        }
+        .flatpickr-month {
+            background-color: purple !important;
+        }
+        .flatpickr-calendar {
+            max-width: 232.667px;
+        }
+        .flatpickr-current-month {
+            padding-top: 0 !important;
+        }
+        .flatpickr-months .flatpickr-prev-month,
+        .flatpickr-months .flatpickr-next-month {
+            color: #333;
+        }
+        .flatpickr-monthSelect-months {
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .flatpickr-monthSelect-months .flatpickr-monthSelect-month {
+            text-align: center;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .flatpickr-monthSelect-months .flatpickr-monthSelect-month:hover {
+            background-color: #f0f0f0;
+        }
+        .flatpickr-current-month {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .sets {
+            display: flex;
+            margin-left: 5px;
+            padding-left: 5px;
+        }
+        .sets button {
+            background-color: transparent;
+            border: 0;
+            cursor: pointer;
+            padding: 2mm 3mm;
+            color: white;
+        }
+        .sets button:hover {
+            background-color: #272636;
+        }
+        .sets select {
+            padding: 2mm 3mm;
+            background-color: transparent;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+        }
+        .sets select:hover {
+            background-color: #272636;
+        }
+        .sets select:hover  option{
+            background-color: #272636;
+        }
+        .button-container {
+            width: 100px;
+        }
+        .button-container button {
+            border: 0;
+            border-radius: 5px;
+            background-color: rgb(226, 210, 242);
+            width: 100px;
+            height: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .button-container p {
+            width: auto;
+            max-width: 200px;
+            position: absolute;
+            border: 0;
+            top: 10px;
+            left: 10%;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            font-size: 20px;
+            border-bottom: 1px solid black !important;
+            color: black !important;
+            padding: 2mm;
+        }
+        .draggable-section {
+            padding: 1mm 0;
+            margin-bottom: 5mm;
+            cursor: move;
+        }
+        #ruler {
+            position: relative;
+            width: 21cm;
+            height: 20px;
+            background: #272636;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+        .tick {
+            position: absolute;
+            height: 100%;
+            color: #9a9a9a;
+            font-size: 10px;
+            line-height: 20px;
+        }
+        .draggable-marker {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #ff0000; /* Triangle color */
+            cursor: ew-resize;
+            transform: translateX(-50%); /* Center align the triangle */
+            z-index: 30; /* Higher z-index to ensure it's above other elements */
+        }
+        #left-marker {
+            left: 10mm; /* Default padding for left */
+        }
+        #right-marker {
+            left: calc(210mm - 10mm); /* Default position for right marker */
+        }
+        .measure-line {
+            position: absolute;
+            width: 0.2px;
+            min-height: 100vh;
+            background-color: #ff0000;
+            display: none;
+            top: 0;
+            left: 10mm;
+            z-index: 20;
+        }
+        th {
+            text-align: left;
+        }
+        td {
+            display: flex;
+        }
+        tr strong {
+            margin-left: 2mm;
+            margin-right: 1mm;
+        }
+        tr p {
+            width: 10cm !important;
+            max-width: 15cm !important;
+        }
+        .placeholder {
+            color: #cecece !important; /* Placeholder text color */
+        }
+        .editable-text {
+            width: 100%;
+            border-bottom: 1px solid transparent !important; /* Default state */
+            transition: background-color 0.3s, border-bottom-color 0.3s;
+            outline: none;
+            color: #000; /* Default text color */
+            outline: none;
+            border: none;
+        }
+        .editable-text:focus {
+            background-color: #fef0ff;
+            border-bottom-color: #580067 !important;
+            outline: none;
+        }
+        .bullet-points {
+            width: 100%;
+            border-bottom: 1px solid transparent !important; /* Default state */
+            transition: background-color 0.3s, border-bottom-color 0.3s;
+            outline: none;
+            color: #000; /* Default text color */
+            outline: none; 
+            border: none;
+        }
+        .bullet-points:focus {
+            background-color: #fef0ff;
+            border-bottom-color: #580067 !important;
+            outline: none;
+        }
+        .section-title {
+            border-bottom: 1px solid black;
+            margin-bottom: 1mm;
+        }
+        .section-title p {
+            color: #043579;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .section p {
+            line-height: 1.5;
+        }
+        .date-input {
+            border: none;
+            outline: none;
+            text-align: center;
+            margin: 0 1mm;
+            width: 20mm;
+            font-weight: bold;
+        }
+        .add-button {
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            position: relative;
+            color: grey;
+            background: 0;
+            align-items: center;
+            margin-left: 2mm;
+        }
+        .add-button:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%; /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            white-space: nowrap;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            font-size: 12px;
+            opacity: 1;
+            z-index: 10;
+        }
+        .remove-button {
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            position: relative;
+            color: rgb(255, 0, 0);
+            background: 0;
+            align-items: center;
+            margin-left: 2mm;
+        }
+        .remove-button:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            white-space: nowrap;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            font-size: 12px;
+            opacity: 1;
+            z-index: 10;
+        }
+        .section-title .remove-button {
+            display: none; /* Hide the remove button by default */
+        }
+        .section-title:hover .remove-button {
+            display: inline-flex; /* Display the remove button when hovering over .section-title p */
+        }
+        .ul:hover .gpt-generate-btn {
+            opacity: 1; /* Visible state */
+            visibility: visible; /* Make visible */
+        }
+        .gpt-generate-form {
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            position: relative; /* Added to contain the close button positioning */
+        }
+        .gpt-generate-form h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .form-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-field:focus {
+            border-color: #DD00AC;
+            outline: none;
+        }
+        textarea.form-field {
+            resize: none;
+        }
+        .gpt-suggestions {
+            border-top: 1px solid #ddd;
+            background-color: #DEDEDE;
+            padding: 20px;
+        }
+        .suggestion {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px; /* Add margin to separate each suggestion */
+            padding-left: 10px;
+        }
+        .suggestion span {
+            font-size: 14px;
+            color: #333;
+            padding-left: 10px;
+        }
+        /* Close button style */
+        .form-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Aligns the close button to the top-right */
+            margin-bottom: 20px; /* Adds some space below the header */
+        }
+        .close-btn {
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s;
+            position: absolute;
+            top: 20px;
+            right: 20px; /* Adjusts to the right within the form */
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+        .gpt-generate-form h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        #save-status {
+            margin-left: 10px;
+            color: green;
+            padding-bottom: 20px;
+        }
+        .bullet-point-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            cursor: pointer; /* Makes the row clickable */
+            transition: background-color 0.2s;
+            background-color: #f9f9f9;
+        }
+        .bullet-point-option:hover {
+            background-color: #f0f0f0; /* Highlight effect on hover */
+        }
+        .bullet-checkbox {
+            margin-right: 10px; /* Space between checkbox and text */
+            cursor: pointer;
+            transform: scale(1.2); /* Slightly larger checkbox */
+        }
+        .bullet-point-option span {
+            color: #333;
+            font-size: 14px;
+        }
+        .bullet-point-option input[type="checkbox"]:checked + span {
+            font-weight: bold; /* Optional: Make checked items bold */
+            color: #333;
+        }
+        .generate-btn-container {
+            display: flex;
+            justify-content: flex-end; /* Align button to the right */
+            margin-top: 10px; /* Optional: space above the button */
+        }
+        .generate-btn {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px; /* Rounded corners */
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff0077, #9b00e5); /* Gradient background */
+            transition: transform 0.2s ease-in-out;
+            outline: none;
+        }
+        .generate-btn i {
+            margin-right: 8px; /* Space between icon and text */
+            font-size: 18px;
+        }
+        .generate-btn:hover {
+            transform: scale(1.05); /* Slight zoom effect on hover */
+        }
+        .generate-btn:active {
+            transform: scale(0.98); /* Slight press effect on click */
+        }
+    </style>
+    <style>
+        .date-input {
+            cursor: pointer;
+        }
+        .back-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background-color: #2C2C2C;
+            color: white;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        .back-button i {
+            font-size: 20px;
+        }
+        .back-button:hover {
+            background-color: #3B1F4C;
+        }
+        .button-container {
+            margin-top: 20px; /* Adjust as needed */
+        }
+    </style>
+    <style>
+        .custom-download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Spacing between icon and text */
+            background-color: #1E1E29; /* Background color similar to your layout */
+            color: #FFFFFF; /* Text color */
+            font-size: 16px;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .custom-download-btn i {
+            font-size: 18px; /* Adjust icon size */
+            color: #EADDFF; /* Icon color similar to the one in your image */
+        }
+        .custom-download-btn:hover {
+            background-color: #3B1F4C; /* Background color on hover */
+            color: #FFFFFF; /* Text color on hover */
+        }
+    </style>
+
+
+
+<style>
+    .upload-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .upload-area {
+        width: 180px; /* Width can be adjusted */
+        aspect-ratio: 9 / 16;
+        border: 2px dashed #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+
+    .upload-area img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none; /* Hidden until an image is uploaded */
+    }
+
+    .upload-text {
+        color: #888;
+        font-size: 16px;
+        text-align: center;
+        position: absolute;
+        z-index: 1;
+    }
+</style>
+</head>
+<body>
+	<section style="width: 100%; position: block; top: 0; height: auto; background-color: #1E1E29; position: fixed; z-index: 30;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0 5%;">
+            <button class="back-button" onclick="goBackToDashboard()"><i class="bi bi-arrow-left"></i></button>
+            <div class="button-container">
+                <div id="save-status"></div>
+                <p id="template-name" style="border: #AFAFAF 2px; border-radius: 4px; color: white !important; background-color: #333144; width: 500px !important; margin-top: 3px;" contenteditable="true" spellcheck="false" class="editable-text placeholder">Untitled</p>
+            </div>
+            <div style="display: flex; padding: 1%; justify-content: center; justify-self: center;">
+                <div class="sets">
+                    <button style="border-radius: 8px 0 0 8px;" data-tooltip="Bold" onclick="document.execCommand('bold', false, '')"><strong>B</strong></button>
+                    <button data-tooltip="Italic" onclick="document.execCommand('italic', false, '')"><i class="fa-solid fa-italic"></i></button>
+                    <button style="border-radius: 0 8px 8px 0;" data-tooltip="Underline" onclick="document.execCommand('underline', false, '')"><i class="fa-solid fa-underline"></i></button>
+                </div>
+    
+                <div class="sets">
+                    <button style="border-radius: 8px 0 0 8px;" data-tooltip="Justify Left" onclick="document.execCommand('justifyLeft', false, '')"><i class='fas fa-align-left'></i></i></button>
+                    <button data-tooltip="Justify Center" onclick="document.execCommand('justifyCenter', false, '')"><i class='fas fa-align-center'></i></button>
+                    <button style="border-radius: 0 8px 8px 0;" data-tooltip="Justify Right" onclick="document.execCommand('justifyRight', false, '')"><i class='fas fa-align-right'></i></button>
+                </div>
+    
+                <div class="sets">
+                    <select onchange="changeFontFamily(this.value)">
+                        <option style="font-family: Arial;" value="Arial">Arial</option>
+                        <option style="font-family: Times New Roman;" value="Times New Roman">Times New Roman</option>
+                        <option style="font-family: Nunito, sans-serif;" value="Nunito, sans-serif">Nunito</option>
+                        <option style="font-family: 'Noto Sans', sans-serif;" value="'Noto Sans', sans-serif">Noto Sans</option>
+                        <option style="font-family: Niramit, sans-serif;" value="Niramit, sans-serif">Niramit</option>
+                        <option style="font-family: Merriweather, serif;" value="Merriweather, serif">Merriweather</option>
+                        <option style="font-family: 'EB Garamond', serif;" value="'EB Garamond', serif">EB Garamond</option>
+                    </select>
+                </div>
+    
+                <div class="sets">
+                    <button style="border-radius: 8px 0 0 8px;" onclick="changeFontSize(-1)"><i class='fas fa-minus'></i></button>
+                    <button onclick="resetFontSize()"><i class="material-icons" style="font-size:18px">text_fields</i></button>
+                    <button style="border-radius: 0 8px 8px 0;" onclick="changeFontSize(1)"><i class='fas fa-plus'></i></button>
+                </div>
+    
+                <div class="sets">
+                    <button style="border-radius: 8px 0 0 8px;" onclick="changeLineHeight(-0.1)"><i class='fas fa-minus'></i></button>
+                    <button onclick="resetLineHeight()"><i class="material-icons" style="font-size:18px">format_line_spacing</i></button>
+                    <button style="border-radius: 0 8px 8px 0;" onclick="changeLineHeight(0.1)"><i class='fas fa-plus'></i></button>
+                </div>
+            </div>
+            <div>
+                <button id="download-pdf" class="custom-download-btn">
+                    <i class="fa fa-download"></i>Download
+                </button>
+            </div>
+        </div>
+        <div style="width: 100%; background-color: #272636; justify-content: center; display: flex;">
+            <div id="ruler" style="width: 210mm; margin-right: 2mm; margin-left: 0;">
+                <div class="measure-line" id="left-measure-line"></div>
+                <div class="measure-line" id="right-measure-line"></div>
+                <div class="draggable-marker" id="left-marker"></div>
+                <div class="draggable-marker" id="right-marker"></div>
+            </div>
+        </div>
+    </section>
+
+    <div id="editable-content" class="draggable">
+        <page size="A4" id="main-container"></page>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
+    <script>
+        function goBackToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const documentId = urlParams.get('id');
+
+            if (documentId) {
+                // Fetch the template name from the backend
+                fetch(`http://localhost:3000/load/${documentId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // If there's a template name, display it
+                        if (data.template_name) {
+                            $('#template-name').text(data.template_name);
+                        } else {
+                            $('#template-name').text('Untitled'); // Fallback if no name found
+                        }
+                    })
+                    .catch(error => console.error('Error fetching template:', error));
+            }
+        });
+
+        // Save the updated template name to the backend when it changes
+        $('#template-name').on('input', function () {
+            const newName = $(this).text();
+            const documentId = new URLSearchParams(window.location.search).get('id');
+
+            // Save the new template name to the server
+            fetch(`/update-template-name/${documentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ newName }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $('#save-status').text('Saved').fadeIn().delay(1000).fadeOut();
+                    } else {
+                        $('#save-status').text('Error saving').fadeIn().delay(1000).fadeOut();
+                    }
+                })
+                .catch(error => console.error('Error updating template name:', error));
+        });
+    </script>
+    <script>
+        // Define the default template
+        const defaultTemplate = `
+            <div id="top-info" style="justify-content: center; display: flex; margin-bottom: 5mm;">
+                <div class="upload-container">
+                    <button class="upload-button" onclick="document.getElementById('imageUpload').click()">Upload Image</button>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                    <img id="uploaded-image" alt="Uploaded Image">
+                </div>
+               <div>
+                   <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="NAME" style="font-weight: bold; font-size: 25px; margin-bottom: 2px; color: #043579; text-transform: uppercase; line-height: 1 !important;">NAME</p>
+                   <div style="display: flex; width: 100%;">
+                       <table>
+                            <tr>
+                                <th>Address</th>
+                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="Kuala Lumpur, Malaysia">Kuala Lumpur, Malaysia</p></td>
+                            </tr>
+                            <tr>
+                                <th>Mobile</th>
+                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="012-3456789">012-3456789</p></td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="abc123@gmail.com">abc123@gmail.com</p></td>
+                            </tr>
+                            <tr>
+                                <th>LinkedIn</th>
+                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="https://www.linkedin.com/in/alibaba">https://www.linkedin.com/in/alibaba</p></td>
+                            </tr>
+                       </table>                       
+                   </div>
+               </div>
+            </div>
+            
+            <div id="objective" class="draggable-section section">
+                <div class="section-title">
+                    <p>OBJECTIVE</p>
+                </div>
+                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Enter your objective...">Enter your objective...</p>
+            </div>
+        
+            <div id="education" class="draggable-section section">
+                <div class="section-title" style="display: flex;">
+                    <p>EDUCATIONAL BACKGROUND</p>
+                    <button class="add-button" data-tooltip="Add university" onclick="addUniversity()"><i class="bi bi-plus-circle"></i></button>
+                    <button class="remove-button" data-tooltip="Remove section" onclick="removeUniversitySection(this)"><i class="bi bi-x-circle"></i></button>
+                </div>
+                <div style="display: flex; max-width: 100%; justify-content: space-between;">
+                    <div style="max-width: 70%; min-width: 70%;">
+                        <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="University" style="font-weight: bold;">University</p>
+                    </div>
+                    <div style="width: 30%; display: flex ;justify-content: end; align-items: center;">
+                        <strong>(</strong>
+                        <input type="text" id="start-date" class="date-input" placeholder="Start Date">
+                        <strong>-</strong>
+                        <input type="text" id="finish-date" class="date-input" placeholder="Finish Date">
+                        <strong>)</strong>
+                    </div>
+                </div>
+                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Degree">Degree</p>
+            </div>
+        
+            <div id="work-experience" class="draggable-section section">
+                <div class="section-title" style="display: flex;">
+                    <p>WORK EXPERIENCE</p>
+                    <button class="add-button" data-tooltip="Add work-experience" onclick="addWorkExperience()"><i class="bi bi-plus-circle"></i></button>
+                    <button class="remove-button" data-tooltip="Remove section" onclick="removeWorkExperienceSection(this)"><i class="bi bi-x-circle"></i></button>
+                </div>
+                <div id="work1">
+                    <div style="display: flex; max-width: 100%; justify-content: space-between;">
+                        <div style="max-width: 70%; min-width: 70%;">
+                            <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
+                        </div>
+                        <div style="width: 30%; display: flex ;justify-content: end; align-items: center;">
+                            <strong>(</strong>
+                            <input type="text" id="start-date" class="date-input" placeholder="Start Date">
+                            <strong>-</strong>
+                            <input type="text" id="finish-date" class="date-input" placeholder="Finish Date">
+                            <strong>)</strong>
+                        </div>
+                    </div>
+                    <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
+                    <ul class="ul" style="padding-left: 20px;">
+                        <li>
+                            <p id="bullet-points-1-1" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 1">Bullet point 1</p>
+                        </li>
+                        <li>
+                            <p id="bullet-points-1-2" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 2">Bullet point 2</p>
+                        </li>
+                        <li>
+                            <p id="bullet-points-1-3" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 3">Bullet point 3</p>
+                        </li>
+                        <button type="button" class="gpt-generate-btn" onclick="showGptGenerateForm(1)">AI Generate✨</button>
+                    </ul>
+                    <div class="gpt-generate-form" id="gpt-generate-form-1" style="display:none;">
+                        <div style="padding: 20px;">
+                            <div class="form-header">
+                                <button class="close-btn" onclick="closeGptForm(1)">✕</button>
+                                <h1 style="font-size:30px; margin: 0;">Create work experience</h1>
+                            </div>
+                            <div class="form-group">
+                                <label for="role">What was your role?</label>
+                                <input type="text" class="role form-field" placeholder="e.g., Software Engineer">
+                            </div>
+                    
+                            <div class="form-group">
+                                <label for="experience-summary">Your work experience in one sentence:</label>
+                                <textarea class="experience-summary form-field" rows="2" placeholder="e.g., Led the development of a project to reduce manual tasks..."></textarea>
+                            </div>
+                    
+                            <div class="generate-btn-container">
+                                <button type="button" class="generate-btn" onclick="generateExperience(1)"><i class="fa-solid fa-bolt"></i> Generate</button>
+                            </div>
+                        </div>
+                
+                        <div class="gpt-suggestions">
+                            <div class="suggestion-options">
+                                <p id="placeholder-message" style="color: #888;">Please enter your role and work experience above</p>
+                                <!-- Generated suggestions with checkboxes will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Load content or default template on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const documentId = urlParams.get('id');
+            
+            if (documentId) {
+                fetch(`http://localhost:3000/load/${documentId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const content = data.content;
+                        const mainContainer = document.getElementById('main-container');
+                        if (!content || content.trim() === '') {
+                            mainContainer.innerHTML = defaultTemplate;
+                        } else {
+                            mainContainer.innerHTML = content;
+                        }
+                        attachEditableEvents(); // Attach events to the loaded content
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Function to attach events to editable elements
+        function attachEditableEvents() {
+            const editableElements = document.querySelectorAll('.editable-text, .bullet-points');
+
+            editableElements.forEach(el => {
+                el.addEventListener('focus', function () {
+                    if (el.innerText === el.dataset.placeholder) {
+                        el.innerText = '';
+                        el.classList.remove('placeholder');
+                    }
+                });
+
+                el.addEventListener('blur', function () {
+                    if (el.innerText.trim() === '') {
+                        el.innerText = el.dataset.placeholder;
+                        el.classList.add('placeholder');
+                    }
+                });
+
+                el.addEventListener('input', function () {
+                    if (el.innerText.trim() === '') {
+                        el.classList.add('placeholder');
+                    } else {
+                        el.classList.remove('placeholder');
+                    }
+                    triggerAutoSave(); // Trigger auto-save on input
+                });
+            });
+            // Initialize Flatpickr only if not already initialized
+            const dateInputs = document.querySelectorAll(".date-input:not(.flatpickr-input)");
+            if (dateInputs.length > 0) {
+                flatpickr(dateInputs, {
+                    plugins: [
+                        new monthSelectPlugin({
+                            shorthand: true,
+                            dateFormat: "M Y",
+                            altFormat: "M Y"
+                        })
+                    ],
+                    altInput: true
+                });
+            }
+        }
+
+        // Auto-save functionality (debounced to save after 1 second of inactivity)
+        let saveTimeout;
+
+        function triggerAutoSave() {
+            clearTimeout(saveTimeout); // Clear previous timeout
+            saveTimeout = setTimeout(saveDraft, 1000); // Save after 1 second
+        }
+
+        function saveDraft() {
+            const content = document.getElementById('main-container').innerHTML;
+            const documentId = new URLSearchParams(window.location.search).get('id');
+
+            fetch(`http://localhost:3000/save/${documentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Draft saved successfully!');
+            })
+            .catch(error => console.error('Error saving draft:', error));
+        }
+    </script>
+    <!-- ruler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('main-container');
+            Sortable.create(container, {
+                handle: '.draggable-section', // Only drag using the handle
+                animation: 150, // Animation duration in milliseconds
+                ghostClass: 'sortable-ghost', // Class name for the ghost element
+            });
+        });
+        
+        function addTick(position, size, symbol, number = null) {
+            // Create a tick element
+            const tick = document.createElement('div');
+            tick.className = 'tick';
+            tick.style.left = `${position}mm`;
+            
+            if (size === 'large') {
+                tick.classList.add('large-tick');
+            }
+            
+            // Set the tick symbol or number
+            if (number !== null) {
+                tick.textContent = number; // Display the number
+            } else {
+                tick.textContent = symbol; // Display the symbol
+            }
+            
+            // Append to ruler
+            document.getElementById('ruler').appendChild(tick);
+        }
+
+        // Loop to add ticks
+        let numberLabel = 1; // Initialize the number counter
+        for (let i = 0; i <= 210; i += 5) {
+            if (i >= 10 && i <= 200 && i % 20 === 0) {
+                addTick(i, 'large', '|', numberLabel); // Add a number every 20mm starting from 10mm
+                numberLabel++; // Increment the number label
+            } else if (i % 10 === 0) {
+                addTick(i, 'large', '|'); // Large tick for every 10mm
+            } else {
+                addTick(i, 'small', '╵'); // Small tick for every 5mm
+            }
+        }
+
+        let currentMarker = null;
+        const minPadding = 10; // Minimum padding in mm
+        const maxPadding = 30; // 40mm max padding on either side
+        const mmToPxRatio = document.getElementById('ruler').offsetWidth / 210; // Convert mm to px
+
+        document.getElementById('left-marker').addEventListener('mousedown', function () {
+            currentMarker = 'left';
+            document.getElementById('left-measure-line').style.display = 'block'; // Show the left line
+        });
+
+        document.getElementById('right-marker').addEventListener('mousedown', function () {
+            currentMarker = 'right';
+            document.getElementById('right-measure-line').style.display = 'block'; // Show the right line
+        });
+
+        document.addEventListener('mouseup', function () {
+            if (currentMarker) {
+                const leftLine = document.getElementById('left-measure-line');
+                const rightLine = document.getElementById('right-measure-line');
+
+                const pageElement = document.querySelector('page');
+
+                // Apply padding changes when mouse is released
+                if (currentMarker === 'left') {
+                    let newLeftPadding = Math.min(Math.max(parseInt(leftLine.style.left) / mmToPxRatio, minPadding), maxPadding);
+                    pageElement.style.paddingLeft = `${newLeftPadding}mm`;
+                } else if (currentMarker === 'right') {
+                    let newRightPadding = Math.min(Math.max((document.getElementById('ruler').offsetWidth - parseInt(rightLine.style.left)) / mmToPxRatio, minPadding), maxPadding);
+                    pageElement.style.paddingRight = `${newRightPadding}mm`;
+                }
+
+                // Hide the lines
+                leftLine.style.display = 'none';
+                rightLine.style.display = 'none';
+                currentMarker = null;
+            }
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (currentMarker) {
+                const rulerRect = document.getElementById('ruler').getBoundingClientRect();
+                const mmToPxRatio = rulerRect.width / 210; // Convert mm to px
+
+                if (currentMarker === 'left') {
+                    let newLeft = e.clientX - rulerRect.left;
+                    newLeft = Math.min(Math.max(newLeft, minPadding * mmToPxRatio), maxPadding * mmToPxRatio);
+                    document.getElementById('left-measure-line').style.left = newLeft + 'px';
+                    document.getElementById('left-marker').style.left = newLeft + 'px';
+                } else if (currentMarker === 'right') {
+                    let newRight = e.clientX - rulerRect.left;
+                    newRight = Math.min(Math.max(newRight, (210 - maxPadding) * mmToPxRatio), rulerRect.width - minPadding * mmToPxRatio);
+                    document.getElementById('right-measure-line').style.left = newRight + 'px';
+                    document.getElementById('right-marker').style.left = newRight + 'px';
+                }
+            }
+        });
+    
+        function changeFontFamily(font) {
+            // Get the A4 container element
+            const a4Container = document.getElementById('main-container');
+
+            // Apply the new font family to the container and all its child elements
+            a4Container.style.fontFamily = font;
+
+            // Optional: Apply the font family to all p elements within the container
+            const textElements = a4Container.querySelectorAll('*');
+            textElements.forEach(element => {
+                element.style.fontFamily = font;
+            });
+        }
+
+        function initFontSizes() {
+            const mainContainer = document.getElementById('main-container');
+            const paragraphs = mainContainer.querySelectorAll('.section p');
+
+            paragraphs.forEach((p) => {
+                // Store the initial font size in a data attribute
+                const computedFontSize = window.getComputedStyle(p).fontSize;
+                p.setAttribute('data-initial-font-size', computedFontSize);
+            });
+        }
+
+        function changeFontSize(delta) {
+            const mainContainer = document.getElementById('main-container');
+            const paragraphs = mainContainer.querySelectorAll('.section p');
+
+            paragraphs.forEach((p) => {
+                let currentFontSize = parseInt(window.getComputedStyle(p).fontSize);
+                currentFontSize += delta;
+                p.style.fontSize = `${currentFontSize}px`;
+            });
+        }
+
+        function resetFontSize() {
+            const mainContainer = document.getElementById('main-container');
+            const paragraphs = mainContainer.querySelectorAll('.section p');
+
+            paragraphs.forEach((p) => {
+                const initialFontSize = p.getAttribute('data-initial-font-size');
+                p.style.fontSize = initialFontSize; // Reset to the initial font size
+            });
+        }
+
+        // Call this function to initialize font sizes when the document is ready
+        document.addEventListener('DOMContentLoaded', initFontSizes);
+
+
+
+        let currentLineHeight = 1.5;
+
+        function changeLineHeight(amount) {
+            currentLineHeight += amount;
+
+            // Apply the new line height to all paragraphs within the main container
+            const mainContainer = document.getElementById('main-container');
+            const paragraphs = mainContainer.querySelectorAll('.section p');
+
+            paragraphs.forEach((p) => {
+                p.style.lineHeight = currentLineHeight.toString();
+            });
+        }
+
+        function resetLineHeight() {
+            currentLineHeight = 1.5; // Default line height
+            const mainContainer = document.getElementById('main-container');
+            const paragraphs = mainContainer.querySelectorAll('.section p');
+
+            paragraphs.forEach((p) => {
+                p.style.lineHeight = currentLineHeight.toString();
+            });
+        }
+    </script>
+    <!-- remove section -->
+    <script>
+        function removeWorkExperienceSection(button) {
+            // Find the closest parent with id 'work-experience' and remove it
+            const workExperienceSection = button.closest('#work-experience');
+            if (workExperienceSection) {
+                workExperienceSection.remove();
+            }
+        }
+    </script>
+    <!-- gpt generate -->
+    <script>
+        let workExperienceCounter = 1; // Start from 2 since work1 and work2 exist
+
+        function addWorkExperience() {
+            workExperienceCounter++;
+            const workExperienceContainer = document.getElementById('work-experience');
+
+            // Create a new work experience section with unique IDs
+            const newWorkExperience = document.createElement('div');
+            newWorkExperience.id = `work${workExperienceCounter}`;
+            newWorkExperience.innerHTML = `
+                <div style="display: flex; max-width: 100%; justify-content: space-between;">
+                    <div style="max-width: 70%; min-width: 70%;">
+                        <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
+                    </div>
+                    <div style="width: 30%; display: flex ;justify-content: end; align-items: center;">
+                        <strong>(</strong>
+                        <input type="text" class="date-input" placeholder="Start Date">
+                        <strong>-</strong>
+                        <input type="text" class="date-input" placeholder="Finish Date">
+                        <strong>)</strong>
+                    </div>
+                </div>
+                <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
+                <ul class="ul" style="padding-left: 20px;">
+                    <li>
+                        <p id="bullet-points-${workExperienceCounter}-1" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 1">Bullet point 1</p>
+                    </li>
+                    <li>
+                        <p id="bullet-points-${workExperienceCounter}-2" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 2">Bullet point 2</p>
+                    </li>
+                    <li>
+                        <p id="bullet-points-${workExperienceCounter}-3" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 3">Bullet point 3</p>
+                    </li>
+                    <button type="button" class="gpt-generate-btn" onclick="showGptGenerateForm(${workExperienceCounter})">AI Generate✨</button>
+                </ul>
+                <div class="gpt-generate-form" id="gpt-generate-form-${workExperienceCounter}" style="display:none;">
+                    <button class="close-btn" onclick="closeGptForm(${workExperienceCounter})">x</button>
+                    <div class="form-group">
+                        <label for="role">What was your role?</label>
+                        <input type="text" class="role form-field" placeholder="e.g., Software Engineer">
+                    </div>
+                    <div class="form-group">
+                        <label for="experience-summary">Your work experience in one sentence:</label>
+                        <textarea class="experience-summary form-field" rows="2" placeholder="e.g., Led the development of a project to reduce manual tasks..."></textarea>
+                    </div>
+                    <button type="button" class="generate-btn" onclick="generateExperience(${workExperienceCounter})">Generate</button>
+                    <div class="gpt-suggestions">
+                        <p>Please enter your role and work experience above</p>
+                        <div class="suggestion-options">
+                            <!-- Generated suggestions with checkboxes will appear here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            workExperienceContainer.appendChild(newWorkExperience);
+        }
+
+        function showGptGenerateForm(id) {
+            const form = document.getElementById(`gpt-generate-form-${id}`);
+            form.style.display = 'block';
+        }
+
+        function closeGptForm(id) {
+            const form = document.getElementById(`gpt-generate-form-${id}`);
+            form.style.display = 'none';
+        }
+
+        function removeWorkExperienceSection(button) {
+            const section = button.closest('.draggable-section');
+            if (section) {
+                section.remove();
+            }
+        }
+
+        async function generateExperience(id) {
+            const form = document.getElementById(`gpt-generate-form-${id}`);
+            const role = form.querySelector('.role').value;
+            const experienceSummary = form.querySelector('.experience-summary').value;
+
+            if (!role || !experienceSummary) {
+                alert('Please fill out your role and experience summary.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/generate-gpt-suggestions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: `Generate three bullet points for the role "${role}" based on the following summary: "${experienceSummary}". Each bullet point should be unique and highlight different aspects of the role.`,
+                    }),
+                });
+
+                const data = await response.json();
+
+                const suggestionsContainer = form.querySelector('.suggestion-options');
+                suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+
+                data.forEach((choice, index) => {
+                    const suggestionDiv = document.createElement('label');
+                    suggestionDiv.classList.add('bullet-point-option');
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.classList.add('bullet-checkbox');
+                    checkbox.dataset.content = choice.message.content.trim();
+                    checkbox.dataset.index = index;
+                    checkbox.dataset.id = id;
+
+                    const labelText = document.createElement('span');
+                    labelText.textContent = choice.message.content.trim();
+
+                    suggestionDiv.appendChild(checkbox);
+                    suggestionDiv.appendChild(labelText);
+                    suggestionsContainer.appendChild(suggestionDiv);
+
+                    checkbox.addEventListener('change', function () {
+                        // Add timestamp when checked
+                        if (checkbox.checked) {
+                            checkbox.dataset.timestamp = Date.now(); // Set timestamp when checked
+                        } else {
+                            delete checkbox.dataset.timestamp; // Remove timestamp if unchecked
+                        }
+                        updateBulletPoints(id); // Call to update bullet points on change
+                    });
+                });
+            } catch (error) {
+                console.error('Error generating experience descriptions:', error);
+            }
+        }
+
+        // Update bullet points to maintain order based on the time they were checked
+        function updateBulletPoints(id) {
+            const allCheckboxes = document.querySelectorAll(`#gpt-generate-form-${id} .bullet-checkbox`);
+            const checkedChoices = Array.from(allCheckboxes).filter(cb => cb.checked);
+
+            // Sort checked choices by timestamp
+            checkedChoices.sort((a, b) => a.dataset.timestamp - b.dataset.timestamp);
+
+            // Clear and reorder bullet points based on sorted checked choices
+            for (let i = 0; i < 3; i++) {
+                const bulletPoint = document.getElementById(`bullet-points-${id}-${i + 1}`);
+                if (checkedChoices[i]) {
+                    bulletPoint.textContent = checkedChoices[i].dataset.content;
+                    bulletPoint.classList.remove('placeholder');
+                } else {
+                    bulletPoint.textContent = `Bullet point ${i + 1}`;
+                    bulletPoint.classList.add('placeholder');
+                }
+            }
+
+            updateHtmlContentInDatabase(); // Update the entire HTML content in the database
+        }
+        // Function to update the entire html_content in the database
+        function updateHtmlContentInDatabase() {
+            const content = document.getElementById('main-container').innerHTML; // Get the updated HTML content
+            const documentId = new URLSearchParams(window.location.search).get('id');
+
+            fetch(`/save/${documentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Content updated successfully!');
+                } else {
+                    console.error('Error updating content:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+    </script>
+    <!-- save as jspdf -->
+    <script>
+        function saveAsPDF() {
+            const pageElement = document.getElementById('main-container'); // Target your <page> element
+
+            // Use jsPDF's html method to convert HTML to PDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // jsPDF's html method: it captures the HTML content and directly writes it to the PDF
+            pdf.html(pageElement, {
+                callback: function (pdf) {
+                    // Save the PDF
+                    pdf.save('template.pdf');
+                },
+                x: 0, // Set the x offset for the content
+                y: 0, // Set the y offset for the content
+                width: 210, // Specify the width of the content area (A4 width minus margins)
+                windowWidth: 800, // Define a virtual browser window width
+            });
+        }
+
+        // Attach the saveAsPDF function to a button click event
+        document.getElementById('download-pdf').addEventListener('click', saveAsPDF);
+    </script>
+    <script>
+        document.getElementById("imageUpload").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            console.log("File selected:", file); // Debugging log
+
+            if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    console.log("Image data:", e.target.result); // Debugging log to confirm file is read
+
+                    const uploadedImage = document.getElementById("uploaded-image");
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = "block"; // Show the image
+                };
+
+                reader.onerror = function(error) {
+                    console.log("Error reading file:", error);
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                alert("Please upload a valid image file.");
+            }
+        });
+    </script>
+</body>
+</html>
