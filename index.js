@@ -1,5 +1,5 @@
 const express = require('express');
-const stripe = require('stripe')('sk_test_CsnggH3iChIYjrFoue5y6M98');
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const session = require('express-session');
 const passport = require('passport');
 const mysql = require('mysql2');
@@ -9,10 +9,11 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+delete require.cache[require.resolve('dotenv')];
+require('dotenv').config();
 
 require('./auth');
 const OpenAI = require('openai');
-// fetch open ai api key
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
@@ -54,7 +55,13 @@ app.use(bodyParser.json({ limit: '10mb' })); // You can increase the limit as ne
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // If you use URL-encoded data
 
 app.use('/views', express.static(path.join(__dirname, 'views')));
-app.use(session({ secret: 'cats'}));
+app.use(session({
+    secret: 'cats',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to `true` in production when using HTTPS
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -289,14 +296,8 @@ app.get('/reset-password/:token', (req, res) => {
 app.get('/access-denied', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'access-denied.html'));
 });
-app.get('/detail_blogs', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'detail_blogs.html'));
-});
-app.get('/detail_projects', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'detail_projects.html'));
-});
-app.get('/detail_services', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'detail_services.html'));
+app.get('/p&p', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'p&p.html'));
 });
 app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'signup.html'));
@@ -439,7 +440,9 @@ app.post('/update-template-name/:id', (req, res) => {
     });
 });
 
-
+app.get('/get_start', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'newUser.html'));
+});
 
 
 
@@ -479,5 +482,9 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
+// test 
+app.get('/test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'test.html'));
+});
 
 app.listen(3000, () => console.log('run on port 3000'));

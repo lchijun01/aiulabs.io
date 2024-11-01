@@ -1,17 +1,12 @@
 <!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Sun Aug 04 2024 23:11:05 GMT+0000 (Coordinated Universal Time)  -->
-<html data-wf-page="66af256a3187c915f01d34c7" data-wf-site="66af256a3187c915f01d3448" lang="en">
+<html data-wf-page="66af256a3187c915f01d34bf" data-wf-site="66af256a3187c915f01d3448" lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Project Detail</title>
-  <meta content="Explore in-depth insights into our latest projects and collaborations. Delve into the intricacies of our innovative solutions, from conception to execution. Discover how our expertise in web development, cybersecurity, and beyond has transformed businesses. Dive into our project details and witness the power of technology in action." name="description">
-  <meta content="Project Detail" property="og:title">
-  <meta content="Explore in-depth insights into our latest projects and collaborations. Delve into the intricacies of our innovative solutions, from conception to execution. Discover how our expertise in web development, cybersecurity, and beyond has transformed businesses. Dive into our project details and witness the power of technology in action." property="og:description">
-  <meta content="Project Detail" property="twitter:title">
-  <meta content="Explore in-depth insights into our latest projects and collaborations. Delve into the intricacies of our innovative solutions, from conception to execution. Discover how our expertise in web development, cybersecurity, and beyond has transformed businesses. Dive into our project details and witness the power of technology in action." property="twitter:description">
-  <meta property="og:type" content="website">
-  <meta content="summary_large_image" name="twitter:card">
+  <title>Login - Aiulabs.io</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta content="Webflow" name="generator">
+  <meta name="google-signin-client_id" content="72022108734-gnmap0ipjhut9ncth1uuat3ip3k9sn2j.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
   <link href="/views/css/normalize.css" rel="stylesheet" type="text/css">
   <link href="/views/css/webflow.css" rel="stylesheet" type="text/css">
   <link href="/views/css/aiulab-f081222d66777be51f-c0f7676780e4a.webflow.css" rel="stylesheet" type="text/css">
@@ -22,6 +17,27 @@
   <script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script>
   <link href="/views/images/favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="/views/images/webclip.png" rel="apple-touch-icon">
+  <script>
+    // Check if the URL has the signup=success query parameter
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('signup') === 'success') {
+            const notificationDiv = document.getElementById('notification');
+            notificationDiv.textContent = 'Sign up successful! You can now log in.';
+            notificationDiv.style.display = 'block'; // Show the notification
+        }
+    };
+  </script>
+  <style>
+    #notification {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #c3e6cb;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
   <section id="topbar" class="top-bar-section">
@@ -71,7 +87,7 @@
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
-                <a href="/detail_projects" class="nav-link">Portfolio</a>
+                <a href="/#portfolio" class="nav-link">Portfolio</a>
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
@@ -79,7 +95,7 @@
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
-                <a href="/detail_blogs" class="nav-link">Blog</a>
+                <a href="/#blog" class="nav-link">Blog</a>
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
@@ -105,69 +121,68 @@
       </div>
     </div>
   </div>
-  <section class="project-detail-section">
+  <section class="other-section">
     <div class="w-layout-blockcontainer container w-container">
-      <div class="project-detail-wraper">
-        <div class="w-layout-grid project-detail-grid">
-          <div id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744a9-f01d34c7">
-            <h1 id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744aa-f01d34c7" data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744aa" style="opacity:0" class="project-name w-dyn-bind-empty"></h1>
-            <div data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744ac" style="opacity:0" class="project-desc w-dyn-bind-empty"></div>
-          </div>
-          <div id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744ae-f01d34c7" class="w-layout-grid project-details-grid">
-            <div id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744af-f01d34c7" data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744af" style="opacity:0" class="project-point-block">
-              <div class="project-point-heading">category</div>
-              <div class="project-point w-dyn-bind-empty"></div>
+      <div class="w-users-userformpagewrap page-wrapper">
+        <div id="notification" style="display:none; color: green; margin-bottom: 10px;"></div>
+        <div class="w-users-userloginformwrapper all-form-block">
+
+
+            <div>
+                <h1>New User?</h1>
+                <button>Create free account</button>
+                <button>I already have an account</button>
             </div>
-            <div id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744b4-f01d34c7" data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744b4" style="opacity:0" class="project-point-block">
-              <div class="project-point-heading">technology</div>
-              <div class="project-point w-dyn-bind-empty"></div>
+
+
+
+
+          <form action="/login" method="post">
+            <div class="w-users-userformheader form-header">
+              <h2 class="form-heading">Log in</h2>
+              <div>Fill in your log in details below.</div>
             </div>
-            <div id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744b9-f01d34c7" data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744b9" style="opacity:0" class="project-point-block">
-              <div class="project-point-heading">Publish Date</div>
-              <div class="project-point w-dyn-bind-empty"></div>
+            <label for="Email" class="field-label">Email</label>
+            <input maxlength="256" placeholder="" name="Email" id="wf-log-in-email" class="all-user-input-text-field w-input" type="email" autocomplete="username" required="">
+            
+            <label for="Password" class="field-label">Password</label>
+            <input maxlength="256" placeholder="" name="Password" id="wf-log-in-password" class="all-user-input-text-field w-input" type="password" required="">
+            
+            <div class="all-user-form-btn-wrapper">
+              <div class="all-user-form-btn-background"></div>
+              <input type="submit" data-wait="Please wait..." class="w-users-userformbutton all-user-form-btn w-button" value="Log In">
             </div>
-            <div id="w-node-_99d4f776-0898-f8cb-4ce1-39b10f1744be-f01d34c7" data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744be" style="opacity:0" class="project-point-block">
-              <a href="#" class="secondary-button p-16 w-inline-block">
-                <div>Project link</div>
-                <div class="secondary-button-arrow">
-                  <div></div>
-                </div>
-              </a>
+            
+            <div class="google-login-container">
+              <a id="login-button" href="/auth/google" class="login-with-google-btn">Login with Google</a>
             </div>
+            
+            <div class="w-users-userformfooter">
+              <span>Don't have an account?</span>
+              <a id="signup-button" href="/signup" class="all-user-page-link">Sign Up</a>
+            </div>
+          </form>
+          
+
+
+
+
+
+          
+          <div style="display:none" data-wf-user-form-error="true" class="w-users-userformerrorstate error-state w-form-fail">
+            <div class="user-form-error-msg" wf-login-form-general-error-error="We&#x27;re having trouble logging you in. Please try again, or contact us if you continue to have problems." wf-login-form-invalid-email_or_password-error="Invalid email or password. Please try again.">We&#x27;re having trouble logging you in. Please try again, or contact us if you continue to have problems.</div>
           </div>
         </div>
+        <a href="/reset-password" class="below-card-link all-user-page-link">Forgot your password?</a>
       </div>
-      <div data-w-id="99d4f776-0898-f8cb-4ce1-39b10f1744c5" style="opacity:0" class="project-full-page-image"><img src="https://d3e54v103j8qbb.cloudfront.net/plugins/Basic/assets/placeholder.60f9b1840c.svg" loading="lazy" alt="" class="w-dyn-bind-empty"></div>
     </div>
   </section>
   <div class="black-background-block">
-    <div class="w-layout-blockcontainer container w-container">
-      <div class="project-padding-block">
-        <div data-w-id="1dd86de3-bff5-ba7a-04b2-0bff588ffb6f" style="opacity:0" class="usp-wraper">
-          <h2 class="usp-heading">unique selling point</h2>
-          <div class="w-layout-grid usp-grid">
-            <div class="usp-collection-item">
-              <div class="usp-check-icon"><img src="/views/images/check-circal.svg" loading="lazy" alt="check circal"></div>
-              <div>Comprehensive Feature Set</div>
-            </div>
-            <div class="usp-collection-item">
-              <div class="usp-check-icon"><img src="/views/images/check-circal.svg" loading="lazy" alt="check circal"></div>
-              <div>No-Coding Prototyping</div>
-            </div>
-            <div class="usp-collection-item">
-              <div class="usp-check-icon"><img src="/views/images/check-circal.svg" loading="lazy" alt="check circal"></div>
-              <div>Blockchain Integration</div>
-            </div>
-          </div>
-        </div>
-        <div data-w-id="1dd86de3-bff5-ba7a-04b2-0bff588ffb78" style="opacity:0" class="project-detail w-dyn-bind-empty w-richtext"></div>
-      </div>
-    </div>
     <footer class="footer-section">
       <div class="footer-gloving-block"></div>
       <div class="w-layout-blockcontainer container w-container">
         <div class="footer-heading-block">
-          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d11f" class="footer-heading">Let&#x27;s dream big and earn more with AiuLab!</div>
+          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d11f" class="footer-heading">Let&#x27;s dream big and earn more with AiuLabs!</div>
           <a data-w-id="c1540238-1c14-59eb-cb03-9665c449d121" href="/#contact" class="secondary-button w-inline-block">
             <div>Get started</div>
             <div class="secondary-button-arrow">
@@ -193,7 +208,7 @@
             <div id="w-node-c1540238-1c14-59eb-cb03-9665c449d131-c449d11b" class="footer-detail-wrapper">
               <div class="footer-link-heading">Links</div>
               <div class="footer-link-block">
-                <a href="/login" class="footer-navigation-ink">Login</a>
+                <a href="/login" aria-current="page" class="footer-navigation-ink w--current">Login</a>
                 <a href="/signup" class="footer-navigation-ink">Sign Up</a>
               </div>
             </div>
@@ -213,15 +228,12 @@
           </div>
         </div>
         <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d163" class="footer-copyright-section">
-          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d164" class="copyright-text">©AiuLab</div>
+          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d164" class="copyright-text">©AiuLabs</div>
         </div>
       </div>
       <div class="all-blur-icons footer-section-icon"><img src="/views/images/all-bg-icon_1all-bg-icon.webp" loading="lazy" sizes="(max-width: 767px) 100px, (max-width: 991px) 130px, 150px" srcset="/views/images/all-bg-icon_1all-bg-icon.webp 500w, /views/images/all-bg-icon_1all-bg-icon.webp 779w" alt="bg icon"></div>
     </footer>
   </div>
-  <a href="#topbar" data-w-id="08fbc015-a124-86a6-86a9-65db235faaff" class="back-to-top w-inline-block">
-    <div></div>
-  </a>
   <div class="cursor-block">
     <div data-w-id="18c61f4c-aead-3fff-e499-070cce103942" class="cursor"></div>
   </div>

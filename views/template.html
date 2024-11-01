@@ -1,9 +1,10 @@
 <page size="A4" id="main-container">
     <div id="top-info" style="justify-content: center; display: flex; margin-bottom: 5mm;">
-        <div class="image-upload-container" style="max-width: 30%;">
-           <input type="file" id="imageUpload" accept="image/*">
-           <img id="uploaded-image" alt="Profile picture">
-       </div>
+        <div class="upload-container" onclick="document.getElementById('imageUpload').click()">
+            <span class="upload-text">Click to Upload</span>
+            <img id="uploaded-image" alt="Uploaded Image">
+        </div>
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
        <div>
            <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="NAME" style="font-weight: bold; font-size: 25px; margin-bottom: 2px; color: #043579; text-transform: uppercase; line-height: 1 !important;">NAME</p>
            <div style="display: flex; width: 100%;">

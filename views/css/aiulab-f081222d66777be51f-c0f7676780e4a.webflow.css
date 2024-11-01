@@ -1504,7 +1504,7 @@ figcaption {
 
 .price-number {
   z-index: 1;
-  font-size: 40px;
+  font-size: 30px;
   font-weight: 800;
   line-height: 130%;
   position: relative;
@@ -3583,7 +3583,7 @@ figcaption {
   }
 
   .price-number {
-    font-size: 36px;
+    font-size: 20px;
   }
 
   .pricing-section {

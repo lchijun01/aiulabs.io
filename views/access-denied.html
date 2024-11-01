@@ -30,13 +30,13 @@
           <div class="moving-hand-lottie">
             <div data-w-id="a1f57eaf-0714-9854-8d32-23826d973cdb" data-animation-type="lottie" data-src="https://uploads-ssl.webflow.com/66386eb1e19f1be233aa86c9/6639d9d279c95dc2a25dd2c3_Animation%20-%201715067319268.json" data-loop="0" data-direction="1" data-autoplay="1" data-is-ix2-target="0" data-renderer="svg" data-default-duration="10" data-duration="0"></div>
           </div>
-          <div class="our-information-text" id="welcome-message">Hello! Welcome to Aiu Lab</div>
+          <div class="our-information-text" id="welcome-message">Hello! Welcome to Aiu Labs</div>
           <script>
             document.addEventListener('DOMContentLoaded', function() {
               fetch('/auth/user')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('welcome-message').textContent = `Hello! ${data.userName} Welcome to Aiu Lab`;
+                    document.getElementById('welcome-message').textContent = `Hello! ${data.userName} Welcome to Aiu Labs`;
                 })
                 .catch(error => console.error('Error fetching user info:', error));
             });
@@ -52,7 +52,7 @@
     <div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="nav-container w-nav">
       <div class="nav-padding-block">
         <div class="navbar-wrapper">
-          <a href="/" class="navbar-logo w-nav-brand"><img src="/views/images/Logo-1.svg" loading="lazy" alt="logo"></a>
+          <a href="/" class="navbar-logo w-nav-brand"><img src="/views/images/nav_icon.svg" loading="lazy" alt="" class="image"></a>
           <nav role="navigation" class="nav-menu-wrapper w-nav-menu">
             <ul role="list" class="nav-menu w-list-unstyled">
               <li class="list-item">
@@ -60,11 +60,7 @@
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
-                <a href="/#best-service" class="nav-link">Services</a>
-                <div class="nav-hover-border"></div>
-              </li>
-              <li class="list-item">
-                <a href="/#portfolio" class="nav-link">Portfolio</a>
+                <a href="/dashboard" class="nav-link">Dashboard</a>
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
@@ -72,27 +68,18 @@
                 <div class="nav-hover-border"></div>
               </li>
               <li class="list-item">
-                <a href="/#blog" class="nav-link">Blog</a>
-                <div class="nav-hover-border"></div>
-              </li>
-              <li class="list-item">
                 <a href="/#contact" class="nav-link nav-last-link">Contact Us</a>
                 <div class="nav-hover-border"></div>
-              </li>
-              <li class="list-item responsive-show">
-                <div class="primary-button-wrapper responsive-show">
-                  <div class="primary-button-background"></div>
-                  <a href="/#pricing" class="primary-button w-button">Get Started</a>
-                </div>
               </li>
             </ul>
           </nav>
           <div class="menu-button w-nav-button">
             <div class="w-icon-nav-menu"></div>
           </div>
+          
           <div class="primary-button-wrapper">
-            <div class="primary-button-background"></div>
-            <a href="/#pricing" class="primary-button w-button">Get Started</a>
+            <div style="-webkit-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0%, 0, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0)" class="primary-button-background"></div>
+            <a id="login-button" href="/login" data-w-id="353b3f28-942b-381b-a4b2-3b6c071ac2e0" class="primary-button w-button">Login</a>
           </div>
         </div>
       </div>
@@ -120,7 +107,7 @@
       <div class="footer-gloving-block"></div>
       <div class="w-layout-blockcontainer container w-container">
         <div class="footer-heading-block">
-          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d11f" class="footer-heading">Let&#x27;s dream big and earn more with AiuLab!</div>
+          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d11f" class="footer-heading">Let&#x27;s dream big and earn more with Aiu Labs!</div>
           <a data-w-id="c1540238-1c14-59eb-cb03-9665c449d121" href="/#contact" class="secondary-button w-inline-block">
             <div>Get started</div>
             <div class="secondary-button-arrow">
@@ -166,7 +153,7 @@
           </div>
         </div>
         <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d163" class="footer-copyright-section">
-          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d164" class="copyright-text">©AiuLab</div>
+          <div data-w-id="c1540238-1c14-59eb-cb03-9665c449d164" class="copyright-text">©AiuLabs</div>
         </div>
       </div>
       <div class="all-blur-icons footer-section-icon"><img src="/views/images/all-bg-icon_1all-bg-icon.webp" loading="lazy" sizes="(max-width: 767px) 100px, (max-width: 991px) 130px, 150px" srcset="/views/images/all-bg-icon_1all-bg-icon.webp 500w, /views/images/all-bg-icon_1all-bg-icon.webp 779w" alt="bg icon"></div>

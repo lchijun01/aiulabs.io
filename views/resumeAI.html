@@ -721,11 +721,11 @@
         // Define the default template
         const defaultTemplate = `
             <div id="top-info" style="justify-content: center; display: flex; margin-bottom: 5mm;">
-                <div class="upload-container">
-                    <button class="upload-button" onclick="document.getElementById('imageUpload').click()">Upload Image</button>
-                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                <div class="upload-container" onclick="document.getElementById('imageUpload').click()">
+                    <span class="upload-text">Click to Upload</span>
                     <img id="uploaded-image" alt="Uploaded Image">
                 </div>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
                <div>
                    <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="NAME" style="font-weight: bold; font-size: 25px; margin-bottom: 2px; color: #043579; text-transform: uppercase; line-height: 1 !important;">NAME</p>
                    <div style="display: flex; width: 100%;">
@@ -1336,21 +1336,19 @@
     <script>
         document.getElementById("imageUpload").addEventListener("change", function(event) {
             const file = event.target.files[0];
-            console.log("File selected:", file); // Debugging log
-
+            
             if (file && file.type.startsWith("image/")) {
                 const reader = new FileReader();
 
                 reader.onload = function(e) {
-                    console.log("Image data:", e.target.result); // Debugging log to confirm file is read
-
                     const uploadedImage = document.getElementById("uploaded-image");
                     uploadedImage.src = e.target.result;
-                    uploadedImage.style.display = "block"; // Show the image
+                    uploadedImage.style.display = "block"; // Display the image
+                    document.querySelector(".upload-text").style.display = "none"; // Hide upload text
                 };
 
                 reader.onerror = function(error) {
-                    console.log("Error reading file:", error);
+                    console.error("Error reading file:", error);
                 };
 
                 reader.readAsDataURL(file);
