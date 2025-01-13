@@ -437,7 +437,7 @@
         };
 
         function loadDocumentList() {
-    fetch('http://localhost:3000/documents')
+    fetch('https://aiulabs.io:3000/documents')
     .then(response => response.json())
     .then(data => {
         const documentList = document.getElementById('document-list');
@@ -552,7 +552,7 @@
 
         function createNewDocument() {
             const title = 'Untitled';  // Set the default title to "Untitled"
-            fetch('http://localhost:3000/create', {
+            fetch('https://aiulabs.io:3000/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -572,7 +572,7 @@
 
         function removeDocument(documentId) {
             if (confirm('Are you sure you want to delete this document?')) {
-                fetch(`http://localhost:3000/remove/${documentId}`, {  // Changed from /delete/ to /remove/
+                fetch(`https://aiulabs.io/remove/${documentId}`, {  // Changed from /delete/ to /remove/
                     method: 'DELETE',
                 })
                 .then(response => {

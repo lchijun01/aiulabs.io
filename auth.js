@@ -8,16 +8,16 @@ const GOOGLE_CLIENT_ID = '709161441205-652uoshcol7ktpeedvfrniplbf7ashfo.apps.goo
 const GOOGLE_CLIENT_SECRET = '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';
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'abc123',
-  database: 'aiulabs'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/google/callback",
+    callbackURL: "https://aiulabs.io/google/callback",
     passReqToCallback: true
   },
   function(request, accessToken, refreshToken, profile, done) {
@@ -82,7 +82,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/google/callback",
+  callbackURL: "https://aiulabs.io/google/callback",
   passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {
