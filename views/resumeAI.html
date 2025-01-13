@@ -5,7 +5,6 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://kit.fontawesome.com/332cfc7815.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
     <script>
@@ -19,22 +18,20 @@
         });
     </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_green.css">
     <link rel="stylesheet" type="text/css" href="/views/css/resume.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200..700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://kit.fontawesome.com/332cfc7815.js" crossorigin="anonymous"></script>
+    <link href="/views/images/favicon.png" rel="shortcut icon" type="image/x-icon">
+    <link href="/views/images/webclip.png" rel="apple-touch-icon">
     <style>
         * {
             margin: 0;
             padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: Arial, sans-serif;
             font-size: 14px;
         }
         body {
@@ -42,12 +39,11 @@
             margin: 0 auto;
         }
         page {
-            width: 21cm;
-            height: 29.7cm;
+            width: 210mm;
+            height: 297mm;
             background: white;
             display: block;
             margin: 0 auto;
-            margin-bottom: 0.5cm;
             position: relative;
             box-sizing: border-box; /* Ensures padding doesn't increase element size */
             padding-left: 10mm; /* Initial padding */
@@ -88,38 +84,6 @@
         @page {
             size: 21cm 29.7cm;
             margin: 0mm;
-        }
-        .flatpickr-month {
-            background-color: purple !important;
-        }
-        .flatpickr-calendar {
-            max-width: 232.667px;
-        }
-        .flatpickr-current-month {
-            padding-top: 0 !important;
-        }
-        .flatpickr-months .flatpickr-prev-month,
-        .flatpickr-months .flatpickr-next-month {
-            color: #333;
-        }
-        .flatpickr-monthSelect-months {
-            padding: 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        .flatpickr-monthSelect-months .flatpickr-monthSelect-month {
-            text-align: center;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-        .flatpickr-monthSelect-months .flatpickr-monthSelect-month:hover {
-            background-color: #f0f0f0;
-        }
-        .flatpickr-current-month {
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         .sets {
             display: flex;
@@ -192,6 +156,13 @@
             align-items: center;
             user-select: none;
         }
+        .draggable-section .editable-text,
+        .draggable-section .bullet-points {
+            cursor: text; /* Default text cursor for editable content */
+        }
+        .draggable-section:hover .drag-handle {
+            color: #333;
+        }
         .tick {
             position: absolute;
             height: 100%;
@@ -235,6 +206,7 @@
         tr strong {
             margin-left: 2mm;
             margin-right: 1mm;
+            font-size: 11px;
         }
         tr p {
             width: 10cm !important;
@@ -251,6 +223,7 @@
             color: #000; /* Default text color */
             outline: none;
             border: none;
+            font-size: 11px;
         }
         .editable-text:focus {
             background-color: #fef0ff;
@@ -265,6 +238,7 @@
             color: #000; /* Default text color */
             outline: none; 
             border: none;
+            font-size: 11px;
         }
         .bullet-points:focus {
             background-color: #fef0ff;
@@ -274,22 +248,17 @@
         .section-title {
             border-bottom: 1px solid black;
             margin-bottom: 1mm;
+            cursor: move;
+            white-space: normal;
         }
         .section-title p {
             color: #043579;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
+            margin-right: 10px;
         }
         .section p {
             line-height: 1.5;
-        }
-        .date-input {
-            border: none;
-            outline: none;
-            text-align: center;
-            margin: 0 1mm;
-            width: 20mm;
-            font-weight: bold;
         }
         .add-button {
             border: none;
@@ -352,8 +321,7 @@
             display: inline-flex; /* Display the remove button when hovering over .section-title p */
         }
         .ul:hover .gpt-generate-btn {
-            opacity: 1; /* Visible state */
-            visibility: visible; /* Make visible */
+            display: inline-block;
         }
         .gpt-generate-form {
             width: 100%;
@@ -363,6 +331,21 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             font-family: Arial, sans-serif;
             position: relative; /* Added to contain the close button positioning */
+        }
+        .gpt-generate-btn {
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 8px; /* Rounded corners */
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff0077, #9b00e5); /* Gradient background */
+            transition: transform 0.2s ease-in-out;
+            outline: none;
         }
         .gpt-generate-form h2 {
             font-size: 24px;
@@ -498,11 +481,14 @@
         .generate-btn:active {
             transform: scale(0.98); /* Slight press effect on click */
         }
+        .pdf-export .placeholder, 
+        .pdf-export .gpt-generate-btn, 
+        .pdf-export .remove-button, 
+        .pdf-export .add-button {
+            display: none !important; /* Hide placeholders and buttons */
+        }
     </style>
     <style>
-        .date-input {
-            cursor: pointer;
-        }
         .back-button {
             width: 45px;
             height: 45px;
@@ -532,6 +518,10 @@
         }
     </style>
     <style>
+        .no-shadow-drag {
+            box-shadow: none !important;
+            opacity: 1 !important;
+        }
         .custom-download-btn {
             display: flex;
             align-items: center;
@@ -556,46 +546,132 @@
             color: #FFFFFF; /* Text color on hover */
         }
     </style>
+    <style>
+        .upload-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .upload-area {
+            width: 180px; /* Width can be adjusted */
+            aspect-ratio: 9 / 16;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .upload-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* Hidden until an image is uploaded */
+        }
+
+        .upload-text {
+            color: #888;
+            font-size: 16px;
+            text-align: center;
+            position: absolute;
+            z-index: 1;
+        }
+    </style>
+    <style>
+        .pdf-export .section-title {
+            margin-bottom: 5mm; /* Add more spacing for section titles */
+        }
+        .pdf-export input {
+            display: inline; /* Convert input fields to inline */
+            font-size: 12px; /* Make it a bit smaller if needed */
+        }
+
+        .project {
+            padding: 10px 15px; /* Padding inside the project section */
+            border-radius: 5px; /* Rounded corners for the project box */
+        }
 
 
+        @media print {
+            .add-button,
+            .remove-button {
+                display: none !important;
+            }
+        }
 
-<style>
-    .upload-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 20px;
-    }
+        .skills-content {
+            display: flex;
+            flex-direction: column;
+        }
 
-    .upload-area {
-        width: 180px; /* Width can be adjusted */
-        aspect-ratio: 9 / 16;
-        border: 2px dashed #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-    }
+        .skill-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 5px;
+        }
 
-    .upload-area img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: none; /* Hidden until an image is uploaded */
-    }
+        .skills-category {
+            flex: 0 0 30%; /* 30% width of the inner content area */
+            max-width: calc(30% - 5px); /* Account for right margin */
+            font-weight: bold;
+            color: #043579;
+            margin-right: 5px; /* Space between category and details */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
-    .upload-text {
-        color: #888;
-        font-size: 16px;
-        text-align: center;
-        position: absolute;
-        z-index: 1;
-    }
-</style>
+        .skills-details {
+            flex: 0 0 70%; /* 70% width of the inner content area */
+            max-width: 70%;
+            color: #333;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+    </style>
+    <style>
+        .present-indicator {
+            color: #555;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .date-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-display {
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: inline-block;
+            color: #333;
+        }
+
+        .date-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 14px;
+            display: none;
+            width: 150px;
+        }
+
+        .date-input:focus {
+            outline: 2px solid #007bff;
+        }
+    </style>
 </head>
 <body>
 	<section style="width: 100%; position: block; top: 0; height: auto; background-color: #1E1E29; position: fixed; z-index: 30;">
@@ -616,18 +692,6 @@
                     <button style="border-radius: 8px 0 0 8px;" data-tooltip="Justify Left" onclick="document.execCommand('justifyLeft', false, '')"><i class='fas fa-align-left'></i></i></button>
                     <button data-tooltip="Justify Center" onclick="document.execCommand('justifyCenter', false, '')"><i class='fas fa-align-center'></i></button>
                     <button style="border-radius: 0 8px 8px 0;" data-tooltip="Justify Right" onclick="document.execCommand('justifyRight', false, '')"><i class='fas fa-align-right'></i></button>
-                </div>
-    
-                <div class="sets">
-                    <select onchange="changeFontFamily(this.value)">
-                        <option style="font-family: Arial;" value="Arial">Arial</option>
-                        <option style="font-family: Times New Roman;" value="Times New Roman">Times New Roman</option>
-                        <option style="font-family: Nunito, sans-serif;" value="Nunito, sans-serif">Nunito</option>
-                        <option style="font-family: 'Noto Sans', sans-serif;" value="'Noto Sans', sans-serif">Noto Sans</option>
-                        <option style="font-family: Niramit, sans-serif;" value="Niramit, sans-serif">Niramit</option>
-                        <option style="font-family: Merriweather, serif;" value="Merriweather, serif">Merriweather</option>
-                        <option style="font-family: 'EB Garamond', serif;" value="'EB Garamond', serif">EB Garamond</option>
-                    </select>
                 </div>
     
                 <div class="sets">
@@ -665,8 +729,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 
     <script>
         function goBackToDashboard() {
@@ -684,52 +746,63 @@
                     .then(data => {
                         // If there's a template name, display it
                         if (data.template_name) {
-                            $('#template-name').text(data.template_name);
+                            const fullName = data.template_name;
+                            const truncatedName =
+                                fullName.length > 10 ? fullName.slice(0, 10) + '...' : fullName;
+
+                            // Set the truncated name with a tooltip showing the full name
+                            $('#template-name')
+                                .text(truncatedName)
+                                .attr('title', fullName); // Add a tooltip with the full name
                         } else {
-                            $('#template-name').text('Untitled'); // Fallback if no name found
+                            $('#template-name').text('Untitled').attr('title', 'Untitled'); // Fallback if no name found
                         }
                     })
                     .catch(error => console.error('Error fetching template:', error));
             }
-        });
 
-        // Save the updated template name to the backend when it changes
-        $('#template-name').on('input', function () {
-            const newName = $(this).text();
-            const documentId = new URLSearchParams(window.location.search).get('id');
+            // Save the new template name to the server on input
+            $('#template-name').on('input', function () {
+                const newName = $(this).text();
+                const documentId = new URLSearchParams(window.location.search).get('id');
 
-            // Save the new template name to the server
-            fetch(`/update-template-name/${documentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ newName }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        $('#save-status').text('Saved').fadeIn().delay(1000).fadeOut();
-                    } else {
-                        $('#save-status').text('Error saving').fadeIn().delay(1000).fadeOut();
-                    }
+                fetch(`/update-template-name/${documentId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ newName }),
                 })
-                .catch(error => console.error('Error updating template name:', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            $('#save-status').text('Saved').fadeIn().delay(1000).fadeOut();
+                        } else {
+                            $('#save-status').text('Error saving').fadeIn().delay(1000).fadeOut();
+                        }
+                    })
+                    .catch(error => console.error('Error updating template name:', error));
+            });
+
+            // Highlight all text in the template name field when it gains focus
+            $('#template-name').on('focus', function () {
+                const range = document.createRange();
+                const selection = window.getSelection();
+                range.selectNodeContents(this);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
         });
+
     </script>
     <script>
         // Define the default template
         const defaultTemplate = `
             <div id="top-info" style="justify-content: center; display: flex; margin-bottom: 5mm;">
-                <div class="upload-container" onclick="document.getElementById('imageUpload').click()">
-                    <span class="upload-text">Click to Upload</span>
-                    <img id="uploaded-image" alt="Uploaded Image">
-                </div>
-                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-               <div>
-                   <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="NAME" style="font-weight: bold; font-size: 25px; margin-bottom: 2px; color: #043579; text-transform: uppercase; line-height: 1 !important;">NAME</p>
-                   <div style="display: flex; width: 100%;">
-                       <table>
+                <div>
+                    <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="NAME" style="font-weight: bold; font-size: 18px; margin-bottom: 2px; color: #043579; text-transform: uppercase; line-height: 1 !important;">NAME</p>
+                    <div style="display: flex; width: 100%;">
+                        <table>
                             <tr>
                                 <th>Address</th>
                                 <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="Kuala Lumpur, Malaysia">Kuala Lumpur, Malaysia</p></td>
@@ -746,42 +819,22 @@
                                 <th>LinkedIn</th>
                                 <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="https://www.linkedin.com/in/alibaba">https://www.linkedin.com/in/alibaba</p></td>
                             </tr>
-                       </table>                       
-                   </div>
-               </div>
+                        </table>                       
+                    </div>
+                </div>
             </div>
             
             <div id="objective" class="draggable-section section">
                 <div class="section-title">
                     <p>OBJECTIVE</p>
                 </div>
-                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Enter your objective...">Enter your objective...</p>
+                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Experienced Regional Office Manager with over 13 years of expertise in driving operational efficiency, client satisfaction, and strategic improvements across cross-functional teams, achieving measurable results in cost reduction, brand growth, , and personnel management.">
+                    Experienced Regional Office Manager with over 13 years of expertise in driving operational efficiency, client satisfaction, and strategic improvements across cross-functional teams, achieving measurable results in cost reduction, brand growth, , and personnel management.
+                </p>
             </div>
-        
-            <div id="education" class="draggable-section section">
-                <div class="section-title" style="display: flex;">
-                    <p>EDUCATIONAL BACKGROUND</p>
-                    <button class="add-button" data-tooltip="Add university" onclick="addUniversity()"><i class="bi bi-plus-circle"></i></button>
-                    <button class="remove-button" data-tooltip="Remove section" onclick="removeUniversitySection(this)"><i class="bi bi-x-circle"></i></button>
-                </div>
-                <div style="display: flex; max-width: 100%; justify-content: space-between;">
-                    <div style="max-width: 70%; min-width: 70%;">
-                        <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="University" style="font-weight: bold;">University</p>
-                    </div>
-                    <div style="width: 30%; display: flex ;justify-content: end; align-items: center;">
-                        <strong>(</strong>
-                        <input type="text" id="start-date" class="date-input" placeholder="Start Date">
-                        <strong>-</strong>
-                        <input type="text" id="finish-date" class="date-input" placeholder="Finish Date">
-                        <strong>)</strong>
-                    </div>
-                </div>
-                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Degree">Degree</p>
-            </div>
-        
             <div id="work-experience" class="draggable-section section">
                 <div class="section-title" style="display: flex;">
-                    <p>WORK EXPERIENCE</p>
+                    <p>WORK&nbsp;EXPERIENCE</p>
                     <button class="add-button" data-tooltip="Add work-experience" onclick="addWorkExperience()"><i class="bi bi-plus-circle"></i></button>
                     <button class="remove-button" data-tooltip="Remove section" onclick="removeWorkExperienceSection(this)"><i class="bi bi-x-circle"></i></button>
                 </div>
@@ -790,13 +843,20 @@
                         <div style="max-width: 70%; min-width: 70%;">
                             <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
                         </div>
-                        <div style="width: 30%; display: flex ;justify-content: end; align-items: center;">
-                            <strong>(</strong>
-                            <input type="text" id="start-date" class="date-input" placeholder="Start Date">
-                            <strong>-</strong>
-                            <input type="text" id="finish-date" class="date-input" placeholder="Finish Date">
-                            <strong>)</strong>
-                        </div>
+                       <div class="date-container">
+        <strong>(</strong>
+        <div>
+            <span id="start-date-display" class="date-display">Start Date</span>
+            <input type="month" contenteditable="true" id="start-date" class="date-input">
+        </div>
+        <strong>-</strong>
+        <div>
+            <span id="end-date-display" class="date-display">End Date</span>
+            <input type="month" contenteditable="true" id="end-date" class="date-input">
+        </div>
+        <strong>)</strong>
+    </div>
+                        
                     </div>
                     <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
                     <ul class="ul" style="padding-left: 20px;">
@@ -840,6 +900,76 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- New Project Section with Padding -->
+                <div class="project">
+                    <strong>Project:</strong> <span class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project Name">Project Name</span>
+                    <ul style="padding-left: 20px;">
+                        <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 1">Project bullet point 1</p></li>
+                        <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 2">Project bullet point 2</p></li>
+                        <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 3">Project bullet point 3</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="education" class="draggable-section section">
+                <div class="section-title" style="display: flex;">
+                    <p>EDUCATIONAL&nbsp;BACKGROUND</p>
+                    <button class="add-button" data-tooltip="Add university" onclick="addUniversity()"><i class="bi bi-plus-circle"></i></button>
+                </div>
+                <div style="display: flex; max-width: 100%; justify-content: space-between;">
+                    <div style="max-width: 70%; min-width: 70%;">
+                        <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="University" style="font-weight: bold;">University</p>
+                    </div>
+                   <div class="date-container">
+        <strong>(</strong>
+        <div>
+            <span id="start-date-display" class="date-display">Start Date</span>
+            <input type="month" contenteditable="true" id="start-date" class="date-input">
+        </div>
+        <strong>-</strong>
+        <div>
+            <span id="end-date-display" class="date-display">End Date</span>
+            <input type="month" contenteditable="true" id="end-date" class="date-input">
+        </div>
+        <strong>)</strong>
+    </div>
+                </div>
+                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Degree">Degree</p>
+            </div>
+
+
+            <div id="skills" class="draggable-section section">
+                <div class="section-title" style="display: flex;">
+                    <p>SKILLS</p>
+                    <button class="add-button" data-tooltip="Add skill" onclick="addSkillRow()"><i class="bi bi-plus-circle"></i></button>
+                </div>
+                <div class="skills-content">
+                    <div class="skill-row">
+                        <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Operations & Office Management">Operations & Office Management</p>
+                        <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="Operations Management, Office Administration, Strategic Planning...">Operations Management, Office Administration, Strategic Planning...</p>
+                    </div>
+                    <div class="skill-row">
+                        <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Team & Personnel Management">Team & Personnel Management</p>
+                        <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="Performance Review, Training & Development, etc.">Performance Review, Training & Development, etc.</p>
+                    </div>
+                    <div class="skill-row">
+                        <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Client & Service Management">Client & Service Management</p>
+                        <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="Client Relationship Management, etc.">Client Relationship Management, etc.</p>
+                    </div>
+                    <div class="skill-row">
+                        <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Financial & Data Analysis">Financial & Data Analysis</p>
+                        <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="Financial Reporting, Data Analysis, etc.">Financial Reporting, Data Analysis, etc.</p>
+                    </div>
+                    <div class="skill-row">
+                        <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Software">Software</p>
+                        <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="Microsoft Office Suite, QuickBooks, etc.">Microsoft Office Suite, QuickBooks, etc.</p>
+                    </div>
+                    <div class="skill-row">
+                        <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Languages">Languages</p>
+                        <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="English (Fluent), Spanish (Intermediate), etc.">English (Fluent), Spanish (Intermediate), etc.</p>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -861,7 +991,7 @@
                         }
                         attachEditableEvents(); // Attach events to the loaded content
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch((error) => console.error('Error:', error));
             }
         });
 
@@ -869,7 +999,8 @@
         function attachEditableEvents() {
             const editableElements = document.querySelectorAll('.editable-text, .bullet-points');
 
-            editableElements.forEach(el => {
+            // Handle contenteditable fields
+            editableElements.forEach((el) => {
                 el.addEventListener('focus', function () {
                     if (el.innerText === el.dataset.placeholder) {
                         el.innerText = '';
@@ -885,37 +1016,60 @@
                 });
 
                 el.addEventListener('input', function () {
-                    if (el.innerText.trim() === '') {
-                        el.classList.add('placeholder');
-                    } else {
-                        el.classList.remove('placeholder');
-                    }
-                    triggerAutoSave(); // Trigger auto-save on input
+                    el.classList.toggle('placeholder', el.innerText.trim() === '');
+                    triggerAutoSave();
                 });
             });
-            // Initialize Flatpickr only if not already initialized
-            const dateInputs = document.querySelectorAll(".date-input:not(.flatpickr-input)");
-            if (dateInputs.length > 0) {
-                flatpickr(dateInputs, {
-                    plugins: [
-                        new monthSelectPlugin({
-                            shorthand: true,
-                            dateFormat: "M Y",
-                            altFormat: "M Y"
-                        })
-                    ],
-                    altInput: true
-                });
-            }
         }
+
+        // Save the entire <page> content
+        function savePageContent() {
+            const content = document.querySelector('#main-container').innerHTML;
+            const documentId = new URLSearchParams(window.location.search).get('id');
+
+            fetch(`/save/${documentId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Content saved successfully!');
+
+                        // Trigger the screenshot update
+                        fetch(`/save-screenshot/${documentId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content }),
+                        })
+                            .then(response => response.json())
+                            .then(screenshotData => {
+                                if (screenshotData.success) {
+                                    console.log('Screenshot updated successfully!');
+                                } else {
+                                    console.error('Screenshot update failed:', screenshotData.error);
+                                }
+                            })
+                            .catch(error => console.error('Screenshot error:', error));
+                    } else {
+                        console.error('Save error:', data.error);
+                    }
+                })
+                .catch(error => console.error('Save content error:', error));
+        }
+
 
         // Auto-save functionality (debounced to save after 1 second of inactivity)
         let saveTimeout;
 
         function triggerAutoSave() {
-            clearTimeout(saveTimeout); // Clear previous timeout
-            saveTimeout = setTimeout(saveDraft, 1000); // Save after 1 second
+            clearTimeout(saveTimeout); // Clear the previous timeout
+            saveTimeout = setTimeout(savePageContent, 1000); // Save the entire <page> after 1 second of inactivity
         }
+
+        // Call attachEditableEvents on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', attachEditableEvents);
 
         function saveDraft() {
             const content = document.getElementById('main-container').innerHTML;
@@ -928,12 +1082,40 @@
                 },
                 body: JSON.stringify({ content }),
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Draft saved successfully!');
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    console.log('Draft saved successfully!');
+                } else {
+                    console.error('Error saving draft:', data.error);
+                }
             })
-            .catch(error => console.error('Error saving draft:', error));
+            .catch((error) => console.error('Error saving draft:', error));
         }
+
+        function handlePlaceholder(el) {
+            el.addEventListener('focus', function () {
+                if (el.innerText === el.dataset.placeholder) {
+                    el.innerText = '';
+                    el.classList.remove('placeholder');
+                }
+            });
+
+            el.addEventListener('blur', function () {
+                if (el.innerText.trim() === '') {
+                    el.innerText = el.dataset.placeholder;
+                    el.classList.add('placeholder');
+                }
+            });
+        }
+
+        editableElements.forEach(el => {
+            handlePlaceholder(el);
+            el.addEventListener('input', function () {
+                el.classList.toggle('placeholder', el.innerText.trim() === '');
+                triggerAutoSave();
+            });
+        });
     </script>
     <!-- ruler -->
     <script>
@@ -1036,20 +1218,7 @@
                 }
             }
         });
-    
-        function changeFontFamily(font) {
-            // Get the A4 container element
-            const a4Container = document.getElementById('main-container');
 
-            // Apply the new font family to the container and all its child elements
-            a4Container.style.fontFamily = font;
-
-            // Optional: Apply the font family to all p elements within the container
-            const textElements = a4Container.querySelectorAll('*');
-            textElements.forEach(element => {
-                element.style.fontFamily = font;
-            });
-        }
 
         function initFontSizes() {
             const mainContainer = document.getElementById('main-container');
@@ -1124,63 +1293,114 @@
     </script>
     <!-- gpt generate -->
     <script>
-        let workExperienceCounter = 1; // Start from 2 since work1 and work2 exist
+        let workExperienceCounter = 0; // Start indexing from 0
 
         function addWorkExperience() {
-            workExperienceCounter++;
             const workExperienceContainer = document.getElementById('work-experience');
 
-            // Create a new work experience section with unique IDs
             const newWorkExperience = document.createElement('div');
-            newWorkExperience.id = `work${workExperienceCounter}`;
+            newWorkExperience.className = 'work-experience-entry';
             newWorkExperience.innerHTML = `
                 <div style="display: flex; max-width: 100%; justify-content: space-between;">
                     <div style="max-width: 70%; min-width: 70%;">
                         <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
                     </div>
-                    <div style="width: 30%; display: flex ;justify-content: end; align-items: center;">
+                    <div style="width: 30%; display: flex; justify-content: end; align-items: center;">
                         <strong>(</strong>
-                        <input type="text" class="date-input" placeholder="Start Date">
+                        <input type="text" class="date-input start-date" placeholder="Start Date">
                         <strong>-</strong>
-                        <input type="text" class="date-input" placeholder="Finish Date">
+                        <input type="text" class="date-input finish-date" placeholder="Finish Date">
                         <strong>)</strong>
                     </div>
                 </div>
                 <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
-                <ul class="ul" style="padding-left: 20px;">
+                <ul>
                     <li>
-                        <p id="bullet-points-${workExperienceCounter}-1" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 1">Bullet point 1</p>
+                        <p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 1">Bullet point 1</p>
                     </li>
-                    <li>
-                        <p id="bullet-points-${workExperienceCounter}-2" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 2">Bullet point 2</p>
-                    </li>
-                    <li>
-                        <p id="bullet-points-${workExperienceCounter}-3" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 3">Bullet point 3</p>
-                    </li>
-                    <button type="button" class="gpt-generate-btn" onclick="showGptGenerateForm(${workExperienceCounter})">AI Generate✨</button>
                 </ul>
-                <div class="gpt-generate-form" id="gpt-generate-form-${workExperienceCounter}" style="display:none;">
-                    <button class="close-btn" onclick="closeGptForm(${workExperienceCounter})">x</button>
-                    <div class="form-group">
-                        <label for="role">What was your role?</label>
-                        <input type="text" class="role form-field" placeholder="e.g., Software Engineer">
-                    </div>
-                    <div class="form-group">
-                        <label for="experience-summary">Your work experience in one sentence:</label>
-                        <textarea class="experience-summary form-field" rows="2" placeholder="e.g., Led the development of a project to reduce manual tasks..."></textarea>
-                    </div>
-                    <button type="button" class="generate-btn" onclick="generateExperience(${workExperienceCounter})">Generate</button>
-                    <div class="gpt-suggestions">
-                        <p>Please enter your role and work experience above</p>
-                        <div class="suggestion-options">
-                            <!-- Generated suggestions with checkboxes will appear here -->
-                        </div>
-                    </div>
-                </div>
             `;
-
             workExperienceContainer.appendChild(newWorkExperience);
+
+            attachEditableEvents(); // Reattach listeners to new elements
         }
+
+        function removeWorkExperience(index) {
+            const workExperienceContainer = document.getElementById('work-experience');
+            const workExperiences = workExperienceContainer.getElementsByClassName('work-experience-entry');
+
+            for (let i = 0; i < workExperiences.length; i++) {
+                if (parseInt(workExperiences[i].dataset.index) === index) {
+                    workExperienceContainer.removeChild(workExperiences[i]);
+                    break;
+                }
+            }
+
+            workExperienceCounter--;
+            reIndexWorkExperiences();
+        }
+
+        function reIndexWorkExperiences() {
+            const workExperienceContainer = document.getElementById('work-experience');
+            const workExperiences = workExperienceContainer.getElementsByClassName('work-experience-entry');
+
+            for (let i = 0; i < workExperiences.length; i++) {
+                workExperiences[i].dataset.index = i;
+                const removeButton = workExperiences[i].querySelector('.remove-button');
+                removeButton.setAttribute('onclick', `removeWorkExperience(${i})`);
+            }
+        }
+
+        function saveDatesToDatabase(startDate, endDate) {
+            // Save the dates to the database using an AJAX call or Fetch API
+            fetch('/save-dates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ startDate, endDate }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dates saved successfully!');
+            })
+            .catch(error => console.error('Error saving dates:', error));
+        }
+
+        // Auto-save function
+        function autoSaveChanges() {
+            const content = document.getElementById('main-container').innerHTML;
+            const pageElement = document.querySelector('page'); // The element to screenshot
+            const documentId = new URLSearchParams(window.location.search).get('id');
+
+            // Generate screenshot
+            html2canvas(pageElement).then((canvas) => {
+                const imageData = canvas.toDataURL('image/png'); // Convert canvas to base64 image
+
+                // Send content and screenshot to the backend
+                fetch(`/save/${documentId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content, screenshot: imageData }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log('Content and screenshot saved successfully:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error saving content and screenshot:', error);
+                    });
+            });
+        }
+
+        // Initial call to add the first work experience if needed
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('work-experience').children.length === 0) {
+                addWorkExperience();
+            }
+        });
 
         function showGptGenerateForm(id) {
             const form = document.getElementById(`gpt-generate-form-${id}`);
@@ -1201,13 +1421,17 @@
 
         async function generateExperience(id) {
             const form = document.getElementById(`gpt-generate-form-${id}`);
-            const role = form.querySelector('.role').value;
-            const experienceSummary = form.querySelector('.experience-summary').value;
+            const role = form.querySelector('.role').value.trim();
+            const experienceSummary = form.querySelector('.experience-summary').value.trim();
 
             if (!role || !experienceSummary) {
                 alert('Please fill out your role and experience summary.');
                 return;
             }
+
+            // Show loading text
+            const placeholderMessage = form.querySelector('#placeholder-message');
+            placeholderMessage.textContent = "Generating suggestions... Please wait.";
 
             try {
                 const response = await fetch('/generate-gpt-suggestions', {
@@ -1222,39 +1446,44 @@
 
                 const data = await response.json();
 
-                const suggestionsContainer = form.querySelector('.suggestion-options');
-                suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+                if (data && Array.isArray(data)) {
+                    // Clear previous suggestions
+                    const suggestionsContainer = form.querySelector('.suggestion-options');
+                    suggestionsContainer.innerHTML = '';
 
-                data.forEach((choice, index) => {
-                    const suggestionDiv = document.createElement('label');
-                    suggestionDiv.classList.add('bullet-point-option');
+                    data.forEach((choice, index) => {
+                        const suggestionDiv = document.createElement('label');
+                        suggestionDiv.classList.add('bullet-point-option');
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.classList.add('bullet-checkbox');
-                    checkbox.dataset.content = choice.message.content.trim();
-                    checkbox.dataset.index = index;
-                    checkbox.dataset.id = id;
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.classList.add('bullet-checkbox');
+                        checkbox.dataset.content = choice.message.content.trim();
+                        checkbox.dataset.index = index;
+                        checkbox.dataset.id = id;
 
-                    const labelText = document.createElement('span');
-                    labelText.textContent = choice.message.content.trim();
+                        const labelText = document.createElement('span');
+                        labelText.textContent = choice.message.content.trim();
 
-                    suggestionDiv.appendChild(checkbox);
-                    suggestionDiv.appendChild(labelText);
-                    suggestionsContainer.appendChild(suggestionDiv);
+                        suggestionDiv.appendChild(checkbox);
+                        suggestionDiv.appendChild(labelText);
+                        suggestionsContainer.appendChild(suggestionDiv);
 
-                    checkbox.addEventListener('change', function () {
-                        // Add timestamp when checked
-                        if (checkbox.checked) {
-                            checkbox.dataset.timestamp = Date.now(); // Set timestamp when checked
-                        } else {
-                            delete checkbox.dataset.timestamp; // Remove timestamp if unchecked
-                        }
-                        updateBulletPoints(id); // Call to update bullet points on change
+                        checkbox.addEventListener('change', function () {
+                            if (checkbox.checked) {
+                                checkbox.dataset.timestamp = Date.now(); // Set timestamp when checked
+                            } else {
+                                delete checkbox.dataset.timestamp; // Remove timestamp if unchecked
+                            }
+                            updateBulletPoints(id);
+                        });
                     });
-                });
+                } else {
+                    placeholderMessage.textContent = "No suggestions found. Please try again.";
+                }
             } catch (error) {
                 console.error('Error generating experience descriptions:', error);
+                placeholderMessage.textContent = "Error occurred while generating suggestions.";
             }
         }
 
@@ -1266,7 +1495,7 @@
             // Sort checked choices by timestamp
             checkedChoices.sort((a, b) => a.dataset.timestamp - b.dataset.timestamp);
 
-            // Clear and reorder bullet points based on sorted checked choices
+             // Clear and reorder bullet points based on sorted checked choices
             for (let i = 0; i < 3; i++) {
                 const bulletPoint = document.getElementById(`bullet-points-${id}-${i + 1}`);
                 if (checkedChoices[i]) {
@@ -1280,6 +1509,7 @@
 
             updateHtmlContentInDatabase(); // Update the entire HTML content in the database
         }
+
         // Function to update the entire html_content in the database
         function updateHtmlContentInDatabase() {
             const content = document.getElementById('main-container').innerHTML; // Get the updated HTML content
@@ -1307,8 +1537,11 @@
     <!-- save as jspdf -->
     <script>
         function saveAsPDF() {
-            const pageElement = document.getElementById('main-container'); // Target your <page> element
-
+            const pageElement = document.getElementById('main-container');
+            
+            // Temporarily add the 'pdf-export' class to apply PDF-only styles
+            pageElement.classList.add('pdf-export');
+            
             // Use jsPDF's html method to convert HTML to PDF
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({
@@ -1317,16 +1550,16 @@
                 format: 'a4'
             });
 
-            // jsPDF's html method: it captures the HTML content and directly writes it to the PDF
+            // Generate the PDF and save
             pdf.html(pageElement, {
                 callback: function (pdf) {
-                    // Save the PDF
                     pdf.save('template.pdf');
+                    pageElement.classList.remove('pdf-export'); // Remove the class after generating the PDF
                 },
-                x: 0, // Set the x offset for the content
-                y: 0, // Set the y offset for the content
-                width: 210, // Specify the width of the content area (A4 width minus margins)
-                windowWidth: 800, // Define a virtual browser window width
+                x: 0,
+                y: 0,
+                width: 210,
+                windowWidth: 800,
             });
         }
 
@@ -1334,28 +1567,77 @@
         document.getElementById('download-pdf').addEventListener('click', saveAsPDF);
     </script>
     <script>
-        document.getElementById("imageUpload").addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            
-            if (file && file.type.startsWith("image/")) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    const uploadedImage = document.getElementById("uploaded-image");
-                    uploadedImage.src = e.target.result;
-                    uploadedImage.style.display = "block"; // Display the image
-                    document.querySelector(".upload-text").style.display = "none"; // Hide upload text
-                };
-
-                reader.onerror = function(error) {
-                    console.error("Error reading file:", error);
-                };
-
-                reader.readAsDataURL(file);
-            } else {
-                alert("Please upload a valid image file.");
-            }
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('main-container');
+            Sortable.create(container, {
+                handle: '.section-title', // Drag handle
+                animation: 150, // Animation duration
+                dragClass: 'no-shadow-drag', // Apply no-shadow class while dragging
+            });
         });
+        function addSkillRow() {
+            const skillsContainer = document.querySelector(".skills-content");
+            const skillRow = document.createElement("div");
+            skillRow.classList.add("skill-row");
+            skillRow.innerHTML = `
+                <p class="editable-text placeholder skills-category" contenteditable="true" spellcheck="false" data-placeholder="Skill Category">Skill Category</p>
+                <p class="editable-text placeholder skills-details" contenteditable="true" spellcheck="false" data-placeholder="Skill Details">Skill Details</p>
+                <button class="remove-button" data-tooltip="Remove" onclick="removeSkillRow(this)"><i class="bi bi-x-circle"></i></button>
+            `;
+            skillsContainer.appendChild(skillRow);
+        }
+
+        function removeSkillRow(button) {
+            button.closest(".skill-row").remove();
+        }
+
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const startDateDisplay = document.getElementById('start-date-display');
+        const endDateDisplay = document.getElementById('end-date-display');
+
+        function handleDateChange(input, display) {
+            input.addEventListener('change', function () {
+                const selectedDate = input.value;
+                if (selectedDate) {
+                    const formattedDate = new Date(selectedDate + '-01').toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                    });
+                    display.textContent = formattedDate;
+                } else {
+                    display.textContent = 'Select Date';
+                }
+                input.style.display = 'none';
+                display.style.display = 'inline-block';
+            });
+
+            input.addEventListener('blur', function () {
+                input.style.display = 'none';
+                display.style.display = 'inline-block';
+            });
+        }
+
+        function handleClick(display, input) {
+            display.addEventListener('click', function () {
+                display.style.display = 'none';
+                input.style.display = 'inline-block';
+                input.focus();
+            });
+        }
+
+        handleDateChange(startDateInput, startDateDisplay);
+        handleDateChange(endDateInput, endDateDisplay);
+
+        handleClick(startDateDisplay, startDateInput);
+        handleClick(endDateDisplay, endDateInput);
+    });
+
     </script>
 </body>
 </html>

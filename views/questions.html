@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Questions</title>
+</head>
+<body>
+    <form method="post" action="/questions">
+        <!-- Use user_id passed from the backend -->
+        <input type="hidden" name="user_id" value="<%= user_id %>" />
+
+        <label for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" />
+
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" />
+
+        <label for="education">Education</label>
+        <input type="text" id="education" name="education" />
+
+        <label for="field_of_study">Field of Study</label>
+        <input type="text" id="field_of_study" name="field_of_study" />
+
+        <label for="experience">Years of Experience</label>
+        <input type="number" id="experience" name="experience" min="0" />
+
+        <label for="job_title">Job Title</label>
+        <input type="text" id="job_title" name="job_title" />
+
+        <label for="employer">Employer</label>
+        <input type="text" id="employer" name="employer" />
+
+        <label for="industry">Industry</label>
+        <input type="text" id="industry" name="industry" />
+
+        <label for="skills">Skills</label>
+        <textarea id="skills" name="skills"></textarea>
+
+        <label for="career_goals">Career Goals</label>
+        <textarea id="career_goals" name="career_goals"></textarea>
+
+        <label for="accomplishments">Accomplishments</label>
+        <textarea id="accomplishments" name="accomplishments"></textarea>
+
+        <label for="linkedin">LinkedIn</label>
+        <input type="url" id="linkedin" name="linkedin" />
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

@@ -107,6 +107,9 @@
             border-radius: 50%;
             margin: 0 20px;
             box-shadow:  0 0 10px rgba(167, 53, 255, 0.5);
+            max-width: 100%;
+            vertical-align: middle;
+            display: inline-block;
         }
 
         a {
@@ -251,6 +254,8 @@
             padding: 0;
             margin: 0 ; /* Centers the list */
             width: 100%; /* Adjusts the width of the entire document list */
+            position: relative; /* Allow child dropdowns to appear properly */
+            overflow: visible; /* Ensure dropdowns are not clipped */
         }
 
         /* Styling for each file box */
@@ -298,18 +303,6 @@
             font-size: 12px;
         }
 
-        .ellipsis-icon-wrapper {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            cursor: pointer;
-            padding: 10px; /* Add padding to increase clickable area */
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         .text-container p {
             margin: 0;
             color: #A9A9A9;
@@ -323,19 +316,37 @@
             margin-left: 10px;
         }
 
-        .options-menu {
-            display: none;
+        .ellipsis-icon-wrapper {
             position: absolute;
-            top: 35px;
-            right: 0;
+            bottom: 10px; /* Position the kebab icon at the bottom-right of the file box */
+            right: 10px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .options-menu {
+            display: none; /* Hidden by default */
+            position: absolute;
+            bottom: 30px; /* Align the dropdown with the bottom of the kebab menu */
+            right: -50%; /* Position dropdown to the left of the kebab menu with a 10px gap */
             background-color: #2E2E2E;
             color: white;
             padding: 10px;
             border-radius: 8px;
             width: 180px;
-            z-index: 10;
+            z-index: 99999;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
+
+        /* Show the dropdown when hovering over the kebab menu */
+        .ellipsis-icon-wrapper:hover .options-menu {
+            display: block;
+        }
+
         .options-menu a {
             display: flex;
             align-items: center;
@@ -346,15 +357,102 @@
             transition: background-color 0.2s ease;
             font-size: 10px;
         }
+
         .options-menu a:hover {
             background-color: #444;
         }
+
         .options-menu a i {
             margin-right: 10px;
+        }
+
+    </style>
+    <style>
+        /* Same CSS styling */
+        .body01 { font-family: Arial, sans-serif; background-color: #1E1E1E; color: #fff; margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .overlay01 { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 9999; font-size: 18px; line-height: 23px;}
+        .account-settings-container01 { background-color: #2C2C2C; padding: 20px; border-radius: 8px; width: 50%; height: 80%; color: #fff; overflow-y: auto; overflow-x: hidden; position: relative; }
+        .h201 { text-align: center; margin-bottom: 20px; color: #EADDFF; }
+        .label01 { font-weight: bold; color: #D3D3D3; margin-top: 10px; }
+        .field-value, .input-field { color: #EADDFF; padding: 8px 10px; background-color: #333; border-radius: 4px; width: 100%; display: inline-block; }
+        .input-field { background-color: #333; color: #fff; border: 1px solid #555; padding: 0; margin-bottom: 6px;}
+        .button01, .edit-btn { background-color: #5a67d8; color: #fff; padding: 10px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 15px; }
+        .button01:hover, .edit-btn:hover { background-color: #4c51bf; }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; color: #EADDFF; cursor: pointer; }
+        .hidden { display: none; }
+        .overlay01 label { font-size: 18px; line-height: 23px; padding: 4px;}
+        .editable {
+            border: none;
+            padding: 2px;
+            background-color: transparent;
+            width: auto; /* Default width */
+            display: inline-block; /* Ensure inline layout when not editing */
+        }
+
+        .editable.editing {
+            border: 1px dashed #ccc; /* Border when editing */
+            padding: 2px; /* Add padding for better appearance */
+            background-color: #444; /* Dark background for editing mode */
+            border-radius: 4px;
+            width: 100%; /* Expand width to 100% when editing */
+            display: block; /* Make it block-level to take full width */
+        }
+
+
+        .editable.placeholder {
+            color: #888; /* Placeholder text styling */
+            font-style: italic;
+        }
+
+        .editable:not(.placeholder) {
+            color: #fff; /* Regular text styling */
+        }
+
+        .button-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .right-column {
+            width: 100%;
+            padding-left: 6px;
+        }
+        .right-column div {
+            margin-bottom: 6px;
+            line-height: 23px;
+            padding: 1px;
+        }
+        .right-column div span{
+            padding: 3px;
+        }
+    </style>
+    <style>
+        .zoom-preview {
+            width: 100%; /* Full width of the file box */
+            height: 168px; /* Approx. 20% of A4 height at 72 PPI */
+            overflow: hidden;
+            position: relative;
+        }
+
+        .zoom-preview img {
+            width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            transform: translateY(0%); /* Adjust vertical position for top crop */
+            object-fit: cover; /* Ensure proper cropping */
+        }
+
+        .flex {
+            display: flex;
         }
     </style>
 </head>
 <body>
+    
     <div class="top-bar">
         <div style="display: flex; align-items: center; padding-left: 40px;">
             <a href="/" class="gradient-text-link" style="margin: 0;">AiulabsAI</a>
@@ -372,10 +470,97 @@
         <ul>
             <li><a href="/"><span class="icon"><i class="bi bi-house-door"></i></span>Home</a></li>
             <div style="border-bottom: 1px solid hsla(0, 0%, 100%, 0.1); margin: 10px 20px;"></div>
-            <li><a href="/resumeAI"><span class="icon"><i class="fa-solid fa-bolt"></i></span> ResumeAI</a></li>
+            <li><a style="background-color: #3B1F4C" href="/resumeAI"><span class="icon"><i class="fa-solid fa-bolt"></i></span> ResumeAI</a></li>
             <div style="border-bottom: 1px solid hsla(0, 0%, 100%, 0.1); margin: 10px 20px;"></div>
-            <li><a href="/resumeAI"><span class="icon"><i class="fa-solid fa-gear"></i></span> Account settings</a></li>
+            <li>
+                <a>
+                    <button style="background-color: transparent;" onclick="openOverlay()">Manage Account</button>
+                </a>
+            </li>
         </ul>
+    </div>
+    
+    
+    <!-- Overlay and Pop-up Container -->
+    <div class="overlay01 hidden" id="overlay"> 
+        <div class="account-settings-container01">
+            <button class="close-btn" onclick="closeOverlay()">&times;</button>
+            <h2>Account Settings</h2>
+            <p style="font-size: 16px;">Subscription Status: <span id="subscription-status" style="text-transform: uppercase;"></span></p>
+            <p style="font-size: 16px;">Until: <span id="subscription-end-date"></span></p>
+    
+            <div id="profile-info">
+                <!-- Editable fields -->
+                <div class="flex">
+                    <!-- Left Column: Labels -->
+                    <div class="left-column">
+                        <label>Full Name:</label>
+                        <label>Phone:</label>
+                        <label>Location:</label>
+                        <label>Education:</label>
+                        <label>Field of Study:</label>
+                        <label>Experience:</label>
+                        <label>Job Title:</label>
+                        <label>Employer:</label>
+                        <label>Industry:</label>
+                        <label>Skills:</label>
+                        <label>Career Goals:</label>
+                        <label>Accomplishments:</label>
+                        <label>LinkedIn:</label>
+                    </div>
+                
+                    <!-- Right Column: Span + Inputs -->
+                    <div class="right-column">
+                        <div>
+                            <span id="fullname" style="text-transform: uppercase;" class="editable" contenteditable="false"></span> 
+                        </div>
+                        <div>
+                            <span id="phone" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="location" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="education" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="field_of_study" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="experience" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="job_title" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="employer" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="industry" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="skills" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="career_goals" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="accomplishments" class="editable" contenteditable="false"></span>
+                        </div>
+                        <div>
+                            <span id="linkedin" class="editable" contenteditable="false"></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="status-message" style="margin-top: 10px; font-size: 14px; font-weight: bold;"></div>
+    
+                <div class="button-container">
+                    <button class="edit-btn" onclick="enableEdit()">Edit</button>
+                    <button class="button01 hidden" id="save-btn" onclick="saveChanges()">Save</button>
+                    <button class="button01 hidden" id="cancel-btn" onclick="cancelEdit()">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -388,7 +573,7 @@
                 fetch('/auth/user')
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('welcome-message').textContent = `Welcome ${data.userName}, 👋🏻`;
+                        document.getElementById('welcome-message').textContent = `Welcome ${data.userName.toUpperCase()}, 👋🏻`;
                     })
                     .catch(error => console.error('Error fetching user info:', error));
                 });
@@ -416,9 +601,6 @@
 
         </div>
     </section>
-
-  
-
     <script>
         // Load list of documents on page load
         window.onload = function() {
@@ -437,122 +619,102 @@
         };
 
         function loadDocumentList() {
-    fetch('https://aiulabs.io:3000/documents')
+    fetch('https://aiulabs.io/documents')
     .then(response => response.json())
     .then(data => {
         const documentList = document.getElementById('document-list');
         documentList.innerHTML = ''; // Clear the list before loading
 
-        data.forEach(doc => {
-            const listItem = document.createElement('li');
-            listItem.className = 'file-box';
+            data.forEach(doc => {
+                const listItem = document.createElement('li');
+                listItem.className = 'file-box';
 
-            // Create the image element for document preview
-            const docImage = document.createElement('img');
-            docImage.src = doc.previewImageUrl || 'path/to/default-image.jpg';
-            docImage.alt = 'Resume Preview';
+                // Image preview container for zoomed-in effect
+                const zoomPreview = document.createElement('div');
+                zoomPreview.className = 'zoom-preview';
 
-            // Add click event listener to the image
-            docImage.addEventListener('click', function() {
-                openDocument(doc.id); // Call openDocument() with the document ID
+                // Image preview
+                const docImage = document.createElement('img');
+                docImage.src = doc.preview_image_path || 'screenshots/1736660563524.jpg'; // Default image
+                docImage.alt = 'Resume Preview';
+                docImage.addEventListener('click', () => openDocument(doc.id));
+
+                zoomPreview.appendChild(docImage); // Wrap the image in the zoom container
+                listItem.appendChild(zoomPreview);
+
+                const textContainer = document.createElement('div');
+                textContainer.className = 'text-container';
+
+                // Truncated file name
+                const fileName = document.createElement('h4');
+                fileName.className = 'file-name'; // Add CSS class for styling
+                fileName.textContent =
+                    doc.title.length > 10 ? `${doc.title.substring(0, 10)}...` : doc.title;
+
+                // Add title attribute for native browser tooltip
+                fileName.setAttribute('title', doc.title);
+
+                textContainer.appendChild(fileName);
+
+                const fileDate = document.createElement('p');
+                fileDate.className = 'file-date';
+                fileDate.textContent = new Date(doc.updated_at).toLocaleDateString();
+                textContainer.appendChild(fileDate);
+
+                listItem.appendChild(textContainer);
+
+                // Kebab menu
+                const ellipsisWrapper = document.createElement('div');
+                ellipsisWrapper.className = 'ellipsis-icon-wrapper';
+                ellipsisWrapper.innerHTML = '<i class="fa fa-ellipsis-v ellipsis-icon"></i>';
+
+                const optionsMenu = document.createElement('div');
+                optionsMenu.className = 'options-menu';
+                optionsMenu.innerHTML = `
+                    <a onclick="duplicateDocument('${doc.id}')"><i class="fa fa-copy"></i> Duplicate</a>
+                    <a onclick="removeDocument('${doc.id}')"><i class="fa fa-trash"></i> Delete</a>
+                `;
+
+                ellipsisWrapper.appendChild(optionsMenu);
+                listItem.appendChild(ellipsisWrapper);
+
+                documentList.appendChild(listItem);
             });
-
-            // Create the document title (file name) container
-            const textContainer = document.createElement('div');
-            textContainer.className = 'text-container';
-
-            const fileName = document.createElement('h4');
-            fileName.textContent = doc.title;
-
-            // Create a paragraph for the date under the file name
-            const fileDate = document.createElement('p');
-            fileDate.className = 'file-date'; // Add a class for easy styling
-            fileDate.textContent = doc.date || 'No Date'; // Use the actual date from your data
-
-            // Append file name and date to the text container
-            textContainer.appendChild(fileName);
-            textContainer.appendChild(fileDate);
-
-            // Create the wrapper for the ellipsis icon
-            const ellipsisWrapper = document.createElement('div');
-            ellipsisWrapper.className = 'ellipsis-icon-wrapper';
-
-            // Create the ellipsis (three dots) icon
-            const ellipsisIcon = document.createElement('i');
-            ellipsisIcon.className = 'fa-solid fa-ellipsis-vertical ellipsis-icon';
-
-            // Append the ellipsis icon to the wrapper
-            ellipsisWrapper.appendChild(ellipsisIcon);
-
-            // Create the options menu
-            const optionsMenu = document.createElement('div');
-            optionsMenu.className = 'options-menu';
-
-            // Add menu options
-            const downloadLink = document.createElement('a');
-            downloadLink.innerHTML = '<i class="fa-solid fa-download"></i> Download PDF';
-            downloadLink.href = `/download/${doc.id}`; // Adjust the link as needed
-
-            const duplicateLink = document.createElement('a');
-            duplicateLink.innerHTML = '<i class="fa-solid fa-copy"></i> Duplicate';
-            duplicateLink.onclick = () => duplicateDocument(doc.id);
-
-            const renameLink = document.createElement('a');
-            renameLink.innerHTML = '<i class="fa-solid fa-pen"></i> Rename';
-            renameLink.onclick = () => renameDocument(doc.id);
-
-            const deleteLink = document.createElement('a');
-            deleteLink.innerHTML = '<i class="fa-solid fa-trash"></i> Delete';
-            deleteLink.onclick = () => removeDocument(doc.id);
-
-            // Append menu options to the options menu
-            optionsMenu.appendChild(downloadLink);
-            optionsMenu.appendChild(duplicateLink);
-            optionsMenu.appendChild(renameLink);
-            optionsMenu.appendChild(deleteLink);
-
-            // Append elements to the list item
-            listItem.appendChild(docImage); // Image at the top
-            listItem.appendChild(textContainer); // File name and date
-            listItem.appendChild(ellipsisWrapper); // Ellipsis icon wrapped in a div
-            listItem.appendChild(optionsMenu); // Hidden options menu
-
-            // Append the list item to the document list
-            documentList.appendChild(listItem);
-
-            // Add event listener to toggle the options menu
-            ellipsisWrapper.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Hide all other open menus
-                document.querySelectorAll('.options-menu').forEach(menu => {
-                    if (menu !== optionsMenu) {
-                        menu.style.display = 'none';
-                    }
-                });
-                // Toggle the clicked menu
-                optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
-            });
-
-            // Prevent click inside the menu from closing it
-            optionsMenu.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-
-        // Add a click event to the document to close the options menu if clicked outside
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.options-menu').forEach(menu => {
-                menu.style.display = 'none';
-            });
-        });
-    })
-    .catch(error => console.error('Error:', error));
+        })
+        .catch(error => console.error('Error loading documents:', error));
 }
 
+        function duplicateDocument(id) {
+            fetch(`/duplicate/${id}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Document duplicated successfully!');
+                        loadDocumentList(); // Reload the document list
+                    } else {
+                        alert(`Error duplicating document: ${data.message}`);
+                    }
+                })
+                .catch(error => console.error('Error duplicating document:', error));
+        }
+
+        function removeDocument(id) {
+            fetch(`/remove/${id}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Document removed successfully!');
+                        loadDocumentList(); // Reload the document list
+                    } else {
+                        alert(`Error removing document: ${data.message}`);
+                    }
+                })
+                .catch(error => console.error('Error removing document:', error));
+        }
 
         function createNewDocument() {
             const title = 'Untitled';  // Set the default title to "Untitled"
-            fetch('https://aiulabs.io:3000/create', {
+            fetch('https://aiulabs.io/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -597,37 +759,219 @@
         }
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to toggle the options menu on click
-            document.querySelectorAll('.ellipsis-icon').forEach((icon) => {
-                icon.addEventListener('click', function(e) {
-                    const optionsMenu = this.nextElementSibling;
-                    // Close any open menus before opening the clicked one
-                    document.querySelectorAll('.options-menu').forEach((menu) => {
-                        if (menu !== optionsMenu) {
-                            menu.style.display = 'none';
-                        }
-                    });
-                    // Toggle the current menu
-                    optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
-                    e.stopPropagation();  // Prevent click from propagating to body
+        // Open overlay and load profile
+        function openOverlay() {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'flex';
+            loadUserProfile();
+        }
+
+        // Close overlay
+        function closeOverlay() {
+            const overlay = document.getElementById('overlay');
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+        }
+        let originalData = {};
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/loadprofile');
+                if (!response.ok) throw new Error('Failed to load profile.');
+
+                const { user_info } = await response.json();
+
+                // Store original data for future cancellation
+                originalData = { ...user_info };
+
+                // Populate fields and handle empty values
+                const fields = [
+                    { id: 'fullname', value: user_info.display_name },
+                    { id: 'phone', value: user_info.phone },
+                    { id: 'location', value: user_info.location },
+                    { id: 'education', value: user_info.education },
+                    { id: 'field_of_study', value: user_info.field_of_study },
+                    { id: 'experience', value: user_info.experience },
+                    { id: 'job_title', value: user_info.job_title },
+                    { id: 'employer', value: user_info.employer },
+                    { id: 'industry', value: user_info.industry },
+                    { id: 'skills', value: user_info.skills },
+                    { id: 'career_goals', value: user_info.career_goals },
+                    { id: 'accomplishments', value: user_info.accomplishments },
+                    { id: 'linkedin', value: user_info.linkedin },
+                ];
+
+                fields.forEach((field) => {
+                    const element = document.getElementById(field.id);
+                    if (element) {
+                        // Use String() to ensure the value is a string
+                        const displayValue = field.value ? String(field.value).trim() : '-';
+                        element.innerText = displayValue; // Show value or fallback to "-"
+                        element.classList.toggle('placeholder', !field.value); // Add placeholder styling for empty fields
+                    }
                 });
+
+                const subscriptionStatus = user_info.subscription_status || '';
+                document.getElementById('subscription-status').innerText = subscriptionStatus.toUpperCase();
+                if (subscriptionStatus.toLowerCase() === 'freetrial') {
+                    document.getElementById('subscription-end-date').innerText = '∞';
+                } else {
+                    document.getElementById('subscription-end-date').innerText =
+                        user_info.subscription_end_date
+                            ? new Date(user_info.subscription_end_date).toLocaleDateString()
+                            : 'N/A';
+                }
+            } catch (err) {
+                console.error('Error loading profile:', err);
+            }
+        }
+
+        function populateFields(user_info) {
+            const fields = [
+                { id: 'fullname', value: user_info.display_name },
+                { id: 'phone', value: user_info.phone },
+                { id: 'location', value: user_info.location },
+                { id: 'education', value: user_info.education },
+                { id: 'field_of_study', value: user_info.field_of_study },
+                { id: 'experience', value: user_info.experience },
+                { id: 'job_title', value: user_info.job_title },
+                { id: 'employer', value: user_info.employer },
+                { id: 'industry', value: user_info.industry },
+                { id: 'skills', value: user_info.skills },
+                { id: 'career_goals', value: user_info.career_goals },
+                { id: 'accomplishments', value: user_info.accomplishments },
+                { id: 'linkedin', value: user_info.linkedin },
+            ];
+
+            fields.forEach((field) => {
+                const element = document.getElementById(field.id);
+                if (element) {
+                    element.innerText = field.value && field.value.trim() ? field.value : '-';
+                    element.classList.toggle('placeholder', !field.value); // Add placeholder styling if empty
+                }
+            });
+        }
+
+        // Enable edit mode
+        function enableEdit() {
+            const editables = document.querySelectorAll('.editable');
+            editables.forEach((span) => {
+                if (span.innerText === '-' || span.innerText === 'Click to edit') {
+                    span.innerText = ''; // Remove placeholder text (dash or "Click to edit") when editing
+                }
+                span.setAttribute('contenteditable', 'true');
+                span.classList.add('editing');
             });
 
-            // Close the menu if clicked outside
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.options-menu').forEach((menu) => {
-                    menu.style.display = 'none';
-                });
+            document.querySelector('.edit-btn').classList.add('hidden');
+            document.getElementById('save-btn').classList.remove('hidden');
+            document.getElementById('cancel-btn').classList.remove('hidden');
+        }
+
+        // Cancel edit and restore placeholders
+        function cancelEdit() {
+            // Restore original values
+            for (const [key, value] of Object.entries(originalData)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.innerText = value || '-';
+                    element.classList.toggle('placeholder', !value);
+                }
+            }
+
+            const editables = document.querySelectorAll('.editable');
+            editables.forEach((span) => {
+                span.setAttribute('contenteditable', 'false');
+                span.classList.remove('editing');
             });
 
-            // Prevent menu from closing when clicking inside it
-            document.querySelectorAll('.options-menu').forEach((menu) => {
-                menu.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            });
+            document.querySelector('.edit-btn').classList.remove('hidden');
+            document.getElementById('save-btn').classList.add('hidden');
+            document.getElementById('cancel-btn').classList.add('hidden');
+        }
+
+        async function saveChanges() {
+    const data = {};
+
+    // Collect data from editable fields
+    document.querySelectorAll('.editable').forEach((span) => {
+        const value = span.innerText.trim();
+        data[span.id] = value || null; // Set empty fields to null
+        span.setAttribute('contenteditable', 'false'); // Disable editing
+        span.classList.remove('editing'); // Remove editing style
+    });
+
+    // Validate LinkedIn URL
+    const linkedin = data['linkedin'];
+    const linkedinRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+    if (linkedin && !linkedinRegex.test(linkedin)) {
+        alert('Please enter a valid LinkedIn profile URL.');
+        // Re-enable editing for LinkedIn field
+        const linkedinField = document.getElementById('linkedin');
+        if (linkedinField) {
+            linkedinField.setAttribute('contenteditable', 'true');
+            linkedinField.classList.add('editing');
+        }
+        return; // Stop saving changes if LinkedIn URL is invalid
+    }
+
+    // Find the status message container
+    const statusMessage = document.getElementById('status-message');
+    if (statusMessage) statusMessage.textContent = ''; // Clear previous messages
+
+    try {
+        const response = await fetch('/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if (statusMessage) {
+                statusMessage.textContent = 'Changes saved successfully!';
+                statusMessage.style.color = 'green';
+            }
+            originalData = { ...data }; // Update originalData
+
+            // Display LinkedIn as a clickable link if valid
+            if (linkedin) {
+                const linkedinField = document.getElementById('linkedin');
+                linkedinField.innerHTML = `<a href="${linkedin}" target="_blank">${linkedin}</a>`;
+            }
+        } else {
+            if (statusMessage) {
+                statusMessage.textContent = 'Failed to save changes.';
+                statusMessage.style.color = 'red';
+            }
+        }
+    } catch (error) {
+        console.error('Error saving changes:', error);
+        if (statusMessage) {
+            statusMessage.textContent = 'An error occurred while saving changes. Please try again.';
+            statusMessage.style.color = 'red';
+        }
+    }
+
+    // Restore button visibility
+    document.querySelector('.edit-btn').classList.remove('hidden');
+    document.getElementById('save-btn').classList.add('hidden');
+    document.getElementById('cancel-btn').classList.add('hidden');
+}
+
+        function closePopup() {
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.classList.add('hidden'); // Add the 'hidden' class
+                overlay.style.display = 'none'; // Explicitly set display to 'none'
+                console.log('Popup closed'); // Debugging log
+            } else {
+                console.error('Overlay element not found!');
+            }
+        }
+
     </script>
     
     <script src="/views/js/checkauth.js"></script>

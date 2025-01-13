@@ -3,145 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration Flow</title>
+    <title>Date Picker with Replaceable Display</title>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #0d0d0d;
-            color: #f4f4f4;
+        .date-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .container {
-            width: 100%;
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 30px;
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-        h2, h3 {
-            text-align: center;
-            color: #e6e6e6;
-        }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
-        }
-        input::placeholder {
-            color: #bbb;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            background: linear-gradient(90deg, #ff0080, #ff8c00);
-            color: #fff;
-            border: none;
-            border-radius: 25px;
+
+        .date-display {
             cursor: pointer;
-            transition: background 0.3s;
+            font-size: 14px;
+            padding: 5px;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: inline-block;
+            color: #333;
         }
-        button:hover {
-            background: linear-gradient(90deg, #ff1c94, #ffa200);
-        }
-        .step {
+
+        .date-input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 14px;
             display: none;
+            width: 150px;
         }
-        .step.active {
-            display: block;
-        }
-        .footer-text {
-            text-align: center;
-            color: #aaa;
-            margin-top: 20px;
-            font-size: 0.9em;
-        }
-        a {
-            color: #ff8c00;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+
+        .date-input:focus {
+            outline: 2px solid #007bff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>User Registration</h2>
-        <div class="step active" id="step1">
-            <h3>Step 1: Create Account</h3>
-            <input type="email" id="email" placeholder="Enter your email">
-            <input type="password" id="password" placeholder="Enter your password">
-            <button onclick="sendOTP()">Next: Verify Email</button>
+    <div class="date-container">
+        <strong>(</strong>
+        <div>
+            <span id="start-date-display" class="date-display">Start Date</span>
+            <input type="month" id="start-date" class="date-input">
         </div>
-        <div class="step" id="step2">
-            <h3>Step 2: Verify Email</h3>
-            <input type="number" id="otp" placeholder="Enter OTP">
-            <button onclick="verifyOTP()">Verify and Continue</button>
+        <strong>-</strong>
+        <div>
+            <span id="end-date-display" class="date-display">End Date</span>
+            <input type="month" id="end-date" class="date-input">
         </div>
-        <div class="step" id="step3">
-            <h3>Step 3: Basic Information</h3>
-            <input type="text" id="background" placeholder="Enter your background">
-            <input type="text" id="education" placeholder="Enter your education">
-            <input type="text" id="work" placeholder="Enter your work experience">
-            <input type="text" id="jobTitle" placeholder="Enter your current job title">
-            <input type="text" id="industry" placeholder="Enter your industry">
-            <input type="text" id="skills" placeholder="Enter your key skills">
-            <input type="text" id="careerGoals" placeholder="Enter your career goals">
-            <input type="url" id="linkedin" placeholder="Enter your LinkedIn profile URL (optional)">
-            <button onclick="submitInfo()">Submit</button>
-        </div>
-    </div>
-
-    <div class="footer-text">
-        <p>Already have an account? <a href="#">Log In</a></p>
+        <strong>)</strong>
     </div>
 
     <script>
-        function sendOTP() {
-            // Simulate sending OTP to email
-            alert("OTP has been sent to your email address.");
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step2').classList.add('active');
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+            const startDateDisplay = document.getElementById('start-date-display');
+            const endDateDisplay = document.getElementById('end-date-display');
 
-        function verifyOTP() {
-            // Simulate OTP verification
-            let otp = document.getElementById('otp').value;
-            if (otp === "123456") { // Simulated correct OTP
-                alert("OTP verified successfully.");
-                document.getElementById('step2').classList.remove('active');
-                document.getElementById('step3').classList.add('active');
-            } else {
-                alert("Invalid OTP. Please try again.");
+            function handleDateChange(input, display) {
+                input.addEventListener('change', function () {
+                    const selectedDate = input.value;
+                    if (selectedDate) {
+                        const formattedDate = new Date(selectedDate + '-01').toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                        });
+                        display.textContent = formattedDate;
+                    } else {
+                        display.textContent = 'Select Date';
+                    }
+                    input.style.display = 'none';
+                    display.style.display = 'inline';
+                });
             }
-        }
 
-        function submitInfo() {
-            // Gather user information
-            let background = document.getElementById('background').value;
-            let education = document.getElementById('education').value;
-            let work = document.getElementById('work').value;
-            let jobTitle = document.getElementById('jobTitle').value;
-            let industry = document.getElementById('industry').value;
-            let skills = document.getElementById('skills').value;
-            let careerGoals = document.getElementById('careerGoals').value;
-            let linkedin = document.getElementById('linkedin').value;
-            
-            // Simulate submission
-            alert("Registration Complete.\nBackground: " + background + "\nEducation: " + education + "\nWork Experience: " + work + "\nJob Title: " + jobTitle + "\nIndustry: " + industry + "\nSkills: " + skills + "\nCareer Goals: " + careerGoals + "\nLinkedIn: " + linkedin);
-        }
+            handleDateChange(startDateInput, startDateDisplay);
+            handleDateChange(endDateInput, endDateDisplay);
+
+            // Click event to show input
+            startDateDisplay.addEventListener('click', function () {
+                startDateInput.style.display = 'inline';
+                startDateInput.focus();
+                startDateDisplay.style.display = 'none';
+            });
+
+            endDateDisplay.addEventListener('click', function () {
+                endDateInput.style.display = 'inline';
+                endDateInput.focus();
+                endDateDisplay.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
