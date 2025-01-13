@@ -1085,8 +1085,8 @@ app.post('/save-screenshot/:id', async (req, res) => {
         const page = await browser.newPage();
 
         // Define a full HTML structure with CSS links
-        const cssPath = '/views/css/resume.css'; // Replace with your actual CSS path
-        const previewcssPath = '/views/css/preview.css'; // Replace with your actual CSS path
+        const cssPath = 'http://localhost:3000/views/css/resume.css'; // Replace with your actual CSS path
+        const previewcssPath = 'http://localhost:3000/views/css/preview.css'; // Replace with your actual CSS path
         const fullHTML = `
             <!DOCTYPE html>
             <html lang="en">

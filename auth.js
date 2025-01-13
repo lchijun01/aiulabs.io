@@ -4,8 +4,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
-const GOOGLE_CLIENT_ID = '709161441205-652uoshcol7ktpeedvfrniplbf7ashfo.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = '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';
+
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -17,7 +16,7 @@ const db = mysql.createConnection({
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://aiulabs.io/google/callback",
+    callbackURL: "http://localhost:3000/google/callback",
     passReqToCallback: true
   },
   function(request, accessToken, refreshToken, profile, done) {
@@ -82,7 +81,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://aiulabs.io/google/callback",
+  callbackURL: "http://localhost:3000/google/callback",
   passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {

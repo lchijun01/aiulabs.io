@@ -741,7 +741,7 @@
 
             if (documentId) {
                 // Fetch the template name from the backend
-                fetch(`https://aiulabs.io/load/${documentId}`)
+                fetch(`http://localhost:3000/load/${documentId}`)
                     .then(response => response.json())
                     .then(data => {
                         // If there's a template name, display it
@@ -979,7 +979,7 @@
             const documentId = urlParams.get('id');
             
             if (documentId) {
-                fetch(`https://aiulabs.io/load/${documentId}`)
+                fetch(`http://localhost:3000/load/${documentId}`)
                     .then(response => response.json())
                     .then(data => {
                         const content = data.content;
@@ -1075,7 +1075,7 @@
             const content = document.getElementById('main-container').innerHTML;
             const documentId = new URLSearchParams(window.location.search).get('id');
 
-            fetch(`https://aiulabs.io/save/${documentId}`, {
+            fetch(`http://localhost:3000/save/${documentId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
