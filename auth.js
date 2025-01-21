@@ -4,7 +4,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
-
+const GOOGLE_CLIENT_ID = '709161441205-652uoshcol7ktpeedvfrniplbf7ashfo.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = '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';
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -20,7 +21,6 @@ passport.use(new GoogleStrategy({
     passReqToCallback: true
   },
   function(request, accessToken, refreshToken, profile, done) {
-    console.log(profile);
     const googleId = profile.id;
     const displayName = profile.displayName;
     const email = profile.emails[0].value;
@@ -68,7 +68,6 @@ passport.deserializeUser(function(id, done) {
     }
     if (results.length > 0) {
       const user = results[0];
-      console.log('User found:', user);
       return done(null, user);
     } else {
       console.error('User not found with ID:', id);
@@ -85,7 +84,6 @@ passport.use(new GoogleStrategy({
   passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {
-  console.log(profile);
   const googleId = profile.id;
   const displayName = profile.displayName;
   const email = profile.emails[0].value;
@@ -126,35 +124,35 @@ passport.use('local-login', new LocalStrategy({
   usernameField: 'Email',     // Name of the email field in your login form
   passwordField: 'Password',  // Name of the password field in your login form
   passReqToCallback: true     // Pass the request object to the callback
-},
-function(req, email, password, done) {
-  // Find the user in the database
-  db.query('SELECT * FROM users WHERE email = ?', [email], function(err, results) {
-    if (err) {
-      return done(err);
-    }
-    if (results.length === 0) {
-      // No user found with that email
-      return done(null, false, { message: 'Invalid email or password.' });
-    }
-    const user = results[0];
-
-    // Check if the user registered via Google
-    if (user.google_id && !user.password) {
-      return done(null, false, { message: 'Please log in with Google.' });
-    }
-
-    // Compare the password with the hashed password in the database
-    bcrypt.compare(password, user.password, function(err, isMatch) {
+  },
+  function(req, email, password, done) {
+    // Find the user in the database
+    db.query('SELECT * FROM users WHERE email = ?', [email], function(err, results) {
       if (err) {
         return done(err);
       }
-      if (!isMatch) {
+      if (results.length === 0) {
+        // No user found with that email
         return done(null, false, { message: 'Invalid email or password.' });
       }
-      // Passwords match, authentication successful
-      return done(null, user);
+      const user = results[0];
+
+      // Check if the user registered via Google
+      if (user.google_id && !user.password) {
+        return done(null, false, { message: 'Please log in with Google.' });
+      }
+
+      // Compare the password with the hashed password in the database
+      bcrypt.compare(password, user.password, function(err, isMatch) {
+        if (err) {
+          return done(err);
+        }
+        if (!isMatch) {
+          return done(null, false, { message: 'Invalid email or password.' });
+        }
+        // Passwords match, authentication successful
+        return done(null, user);
+      });
     });
-  });
-}
+  }
 ));

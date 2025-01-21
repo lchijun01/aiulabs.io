@@ -18,7 +18,7 @@ const crypto = require('crypto'); // For generating OTP
 const otps = new Map(); // To store OTPs temporarily
 const app = express();
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY1
 });
 const transporter = nodemailer.createTransport({
     host: 'smtp.porkbun.com', // SMTP Hostname
@@ -159,7 +159,6 @@ app.post('/create-checkout-session', async (req, res) => {
             success_url: `${req.headers.origin}/dashboard?subs=success`,
             cancel_url: `${req.headers.origin}/?payment_status=cancelled`,
         });
-        console.log('Metadata (User ID):', req.user.id);
 
         res.json({ url: session.url });
     } catch (error) {
@@ -270,8 +269,11 @@ app.post('/cancel-subscription', isLoggedIn, (req, res) => {
 app.get('/success', (req, res) => {
     res.send('Subscription successful!');
 });
-app.get('/video', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'video.html'));
+app.get('/welcome', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'welcome.html'));
+});
+app.get('/generateQR', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'generateQR.html'));
 });
 // main page
 app.get('/', (req, res) => {
@@ -525,39 +527,139 @@ app.post('/google-signup', async (req, res) => {
         res.status(500).json({ error: "Failed to sign up with Google" });
     }
 });
-app.get('/questions', isLoggedIn, (req, res) => {
-    const user_id = req.user.id; // Get logged-in user's ID
-    res.render('questions', { user_id });
+app.get('/signup1', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'signup1.html'));
 });
-app.post('/questions', isLoggedIn, async (req, res) => {
-    const {
+app.post('/signup1', async (req, res) => {
+    const { email, name, password, subscribed_to_marketing } = req.body;
+
+    if (!email || !name || !password) {
+        return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    try {
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Default subscribed_to_marketing to 'false' if not provided
+        const isSubscribed = subscribed_to_marketing === 'true' ? 'true' : 'false';
+
+        // Query to insert the user
+        const query = `
+            INSERT INTO users (email, password, display_name, subscribed_to_marketing)
+            VALUES (?, ?, ?, ?)
+        `;
+        const values = [email, hashedPassword, name, isSubscribed];
+
+        // Execute the query
+        const result = await db.execute(query, values);
+
+        // Redirect to the login page on success
+        res.redirect('/login1');
+    } catch (err) {
+        console.error('Signup error:', err.message);
+        res.status(500).json({ error: 'Failed to sign up.' });
+    }
+});
+app.get('/login1', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'login1.html'));
+});
+app.post('/login1', function(req, res, next) {
+    passport.authenticate('local-login', function(err, user, info) {
+      if (err) {
+        console.error('Login error:', err);
+        return res.status(500).send('An error occurred during login.');
+      }
+      if (!user) {
+        // Authentication failed
+        return res.status(400).send(info.message);
+      }
+      // Log the user in
+      req.logIn(user, function(err) {
+        if (err) {
+          console.error('Login error:', err);
+          return res.status(500).send('An error occurred during login.');
+        }
+        // Login successful
+        return res.redirect('/questions');
+      });
+    })(req, res, next);
+});
+app.get('/loginFirst', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'loginFirst.html'));
+});
+
+
+
+app.get('/questions', isLoggedIn, (req, res) => {
+    const user_id = req.user.id; // Assuming `req.user.id` is available through middleware
+
+    // Check if the questionnaire has already been submitted
+    db.execute(`SELECT questionnaire_submitted FROM users WHERE id = ?`, [user_id], (err, results) => {
+        if (err) {
+            console.error("Error checking questionnaire submission:", err);
+            return res.status(500).send("An error occurred");
+        }
+
+        if (results.length > 0) {
+            const questionnaireStatus = results[0].questionnaire_submitted;
+
+            // Check if the status is "false" as a string
+            if (questionnaireStatus === "false") {
+                return res.sendFile(path.join(__dirname, 'views', 'questions.html')); // Load the questions page
+            }
+
+            // Redirect to dashboard if the questionnaire has been submitted
+            return res.redirect('/dashboard');
+        }
+
+        // If no user found (optional fallback)
+        res.status(404).send("User not found");
+    });
+});
+app.post('/questions', isLoggedIn, (req, res) => {
+    let {
         phone, location, education, field_of_study, experience,
         job_title, employer, industry, skills, career_goals, accomplishments, linkedin
     } = req.body;
 
     const user_id = req.user.id;
 
-    try {
-        // Insert the profile data
-        await db.execute(
-            `INSERT INTO user_profiles (user_id, phone, location, education, field_of_study, 
-             experience, job_title, employer, industry, skills, career_goals, accomplishments, linkedin)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [user_id, phone, location, education, field_of_study, experience, job_title, employer, industry, skills, career_goals, accomplishments, linkedin]
-        );
+    // Convert empty strings to null for nullable fields
+    experience = experience ? parseInt(experience) : null; // Convert to integer or set to null
 
-        // Mark the questionnaire as submitted
-        await db.execute(
-            `UPDATE users SET questionnaire_submitted = ? WHERE id = ?`,
-            [true, user_id]
-        );
+    const queryInsertProfile = `
+        INSERT INTO user_profiles 
+        (user_id, phone, location, education, field_of_study, 
+         experience, job_title, employer, industry, skills, career_goals, accomplishments, linkedin)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-        res.redirect('/dashboard');
-    } catch (err) {
-        console.error("Error saving user profile:", err);
-        res.status(500).json({ error: "Failed to save user profile" });
-    }
+    db.execute(queryInsertProfile, [
+        user_id, phone || null, location || null, education || null, field_of_study || null,
+        experience, job_title || null, employer || null, industry || null, 
+        skills || null, career_goals || null, accomplishments || null, linkedin || null
+    ], (err) => {
+        if (err) {
+            console.error("Error saving user profile:", err);
+            return res.status(500).json({ error: "Failed to save user profile" });
+        }
+
+        const queryUpdateUser = `UPDATE users SET questionnaire_submitted = ? WHERE id = ?`;
+
+        db.execute(queryUpdateUser, ['true', user_id], (err) => {
+            if (err) {
+                console.error("Error updating questionnaire status:", err);
+                return res.status(500).json({ error: "Failed to update questionnaire status" });
+            }
+
+            res.redirect('/dashboard');
+        });
+    });
 });
+
+
+
 app.get('/api/check-questionnaire', (req, res) => {
     if (req.isAuthenticated()) {
         const userId = req.user.id;
@@ -726,25 +828,61 @@ app.post('/verify-otp', (req, res) => {
 
 
 
-app.post('/generate-gpt-suggestions', async (req, res) => {
+app.post('/generate-gpt-suggestions', (req, res) => {
     const { prompt } = req.body;
-
-    try {
-        const completion = await openai.chat.completions.create({
-            messages: [{ role: "user", content: prompt }],
-            model: "gpt-4",
-            max_tokens: 300,
-            temperature: 0.7,
-            n: 3,
-        });
-
-        console.log('OpenAI Response:', completion.choices);  // Log the API response
-        res.json(completion.choices);
-    } catch (error) {
-        console.error('Error generating GPT-4 suggestions:', error);
-        res.status(500).send('Error generating GPT-4 suggestions');
+    const userId = req.user.id;
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required.' });
     }
+
+    // Check the user's available prompts
+    const queryCheck = 'SELECT * FROM users WHERE id = ?';
+    db.query(queryCheck, [userId], (err, results) => {
+        if (err) {
+            console.error('Error checking user:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        const user = results[0];
+
+        if (user.defaultgptprompt <= 0) {
+            return res.status(403).json({
+                error: 'No prompts remaining. Please upgrade your plan to continue.',
+            });
+        }
+
+        // Decrement the `defaultgptprompt` count
+        const queryUpdate = 'UPDATE users SET defaultgptprompt = defaultgptprompt - 1 WHERE id = ?';
+        db.query(queryUpdate, [userId], (updateErr) => {
+            if (updateErr) {
+                console.error('Error updating user prompts:', updateErr);
+                return res.status(500).json({ error: 'Database error' });
+            }
+
+            // Call OpenAI API
+            openai.chat.completions
+                .create({
+                    messages: [{ role: 'user', content: prompt }],
+                    model: 'gpt-4',
+                    max_tokens: 300,
+                    temperature: 0.7,
+                    n: 3,
+                })
+                .then((completion) => {
+                    res.json(completion.choices);
+                })
+                .catch((error) => {
+                    console.error('Error generating GPT-4 suggestions:', error);
+                    res.status(500).send('Error generating GPT-4 suggestions');
+                });
+        });
+    });
 });
+
 app.get('/dashboard', isLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
@@ -1086,7 +1224,6 @@ app.post('/save-screenshot/:id', async (req, res) => {
 
         // Define a full HTML structure with CSS links
         const cssPath = 'http://localhost:3000/views/css/resume.css'; // Replace with your actual CSS path
-        const previewcssPath = 'http://localhost:3000/views/css/preview.css'; // Replace with your actual CSS path
         const fullHTML = `
             <!DOCTYPE html>
             <html lang="en">
@@ -1095,7 +1232,91 @@ app.post('/save-screenshot/:id', async (req, res) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Resume</title>
                 <link rel="stylesheet" href="${cssPath}">
-                <link rel="stylesheet" href="${previewcssPath}">
+                <style>
+                    .date-container {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+
+                    .date-display {
+                        cursor: pointer;
+                        color: black; /* Black text color */
+                        text-decoration: none; /* Remove underline */
+                        position: relative;
+                    }
+
+                    .month-picker {
+                        position: fixed;
+                        background: white;
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                        z-index: 1010;
+                        width: 200px;
+                        text-align: center;
+                        cursor: default;
+                        border-radius: 8px; /* Slightly rounded corners for a modern look */
+                    }
+
+                    .month-picker .year {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                    }
+
+                    .month-picker .months {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 5px;
+                        justify-content: center;
+                    }
+
+                    .month-picker .month {
+                        width: 45px;
+                        padding: 5px;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.1s ease-in-out; /* Smooth transition */
+                        border-radius: 6px;
+                        background-color: white; /* Default background */
+                    }
+
+                    .month-picker .month:hover {
+                        background-color: #eaeefc; /* Soft pastel hover color */
+                        color: #4a6ef5; /* Contrast text color */
+                        transform: scale(1.1); /* Slight zoom effect */
+                    }
+
+                    .month-picker .actions {
+                        margin-top: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+
+                    .month-picker .action {
+                        cursor: pointer;
+                        font-size: 14px;
+                        color: #4a6ef5; /* Soft blue for actions */
+                        transition: color 0.1s ease-in-out; /* Smooth color transition */
+                    }
+
+                    .month-picker .action:hover {
+                        color: #354bb7; /* Darker blue on hover */
+                    }
+
+                    .year span {
+                        cursor: pointer;
+                        transition: all 0.1s ease-in-out; /* Smooth transition for year navigation */
+                    }
+
+                    .year span:hover {
+                        color: #4a6ef5; /* Match hover color for consistency */
+                        transform: scale(1.2); /* Slight zoom effect */
+                    }
+                </style>
             </head>
             <body>
                 <page>
@@ -1166,7 +1387,7 @@ app.post('/login', function(req, res, next) {
           return res.status(500).send('An error occurred during login.');
         }
         // Login successful
-        return res.redirect('/');
+        return res.redirect('/questions');
       });
     })(req, res, next);
 });

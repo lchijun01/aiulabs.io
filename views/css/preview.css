@@ -605,39 +605,3 @@ textarea.form-field {
     word-break: break-word;
     white-space: normal;
 }
-
-
-.present-indicator {
-    color: #555;
-    font-weight: bold;
-    margin-left: 5px;
-}
-.date-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.date-display {
-    cursor: pointer;
-    font-size: 14px;
-    padding: 5px;
-    border: 1px dashed #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-    display: inline-block;
-    color: #333;
-}
-
-.date-input {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px;
-    font-size: 14px;
-    display: none;
-    width: 150px;
-}
-
-.date-input:focus {
-    outline: 2px solid #007bff;
-}

@@ -32,15 +32,11 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            font-size: 14px;
-        }
-        body {
-            background: #333144;
-            margin: 0 auto;
+            font-size: 12px;
         }
         page {
             width: 210mm;
-            height: 297mm;
+            min-height: 297mm;
             background: white;
             display: block;
             margin: 0 auto;
@@ -55,31 +51,43 @@
         .draggable {
             width: 100%;
             height: 85vh;
-            display: flex;
+            display: block;
             padding-top: 100px;
             justify-content: center;
             overflow-y: auto;
         }
         /* Webkit browsers (Chrome, Safari, Edge) */
         .draggable::-webkit-scrollbar {
-            width: 2px; /* Width of the scrollbar */
-            height: 0; /* Height for horizontal scrollbars (if any) */
+            width: 5px;
         }
         .draggable::-webkit-scrollbar-track {
-            background: #f0f0f0; /* Track color */
+            background: #eaeaea;
         }
         .draggable::-webkit-scrollbar-thumb {
-            background-color: #ffffff; /* Scrollbar thumb color */
+            background: #b3b3b3;
             border-radius: 10px;
         }
-        /* Firefox */
+        /* Firefox Scrollbar Styling */
         .draggable {
-            scrollbar-width: thin; /* Make the scrollbar thin */
-            scrollbar-color: #b3b3b3 #f0f0f0; /* Thumb color | Track color */
+            scrollbar-width: thin;
+            scrollbar-color: #b3b3b3 #f0f0f0;
         }
-        page[size="A4"] {  
+        page[size="A4"] {
             width: 21cm;
-            height: 29.7cm; 
+            height: 29.7cm;
+            background: white;
+            display: block;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+            padding: 10mm;
+        }
+        body {
+            background: #333144;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow-y: scroll;
         }
         @page {
             size: 21cm 29.7cm;
@@ -314,38 +322,52 @@
             opacity: 1;
             z-index: 10;
         }
-        .section-title .remove-button {
+        .section-title .remove-button, .section-title .add-button {
             display: none; /* Hide the remove button by default */
         }
-        .section-title:hover .remove-button {
+        .section-title:hover .remove-button, .section-title:hover .add-button {
             display: inline-flex; /* Display the remove button when hovering over .section-title p */
         }
         .ul:hover .gpt-generate-btn {
             display: inline-block;
         }
         .gpt-generate-form {
-            width: 100%;
+            width: 50vh;
             margin-top: 10px;
             border-radius: 10px;
             background-color: #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             font-family: Arial, sans-serif;
             position: relative; /* Added to contain the close button positioning */
+            position: fixed;
+            left: 2%;
+            top: 20%;
+        }
+        .ul {
+            position: relative; /* Ensures button positioning within the UL */
+            padding-left: 20px;
         }
         .gpt-generate-btn {
-            margin-top: 5px;
+            position: absolute;
+            top: 50%; /* Center vertically relative to UL */
+            left: 50%; /* Center horizontally relative to UL */
+            transform: translate(-50%, -50%); /* Adjusts position to align with the center */
+            z-index: 10; /* Ensures button is on top */
             display: flex;
             align-items: center;
             padding: 5px 10px;
             border: none;
-            border-radius: 8px; /* Rounded corners */
+            border-radius: 8px;
             font-size: 12px;
             font-weight: bold;
             color: #ffffff;
             cursor: pointer;
-            background: linear-gradient(45deg, #ff0077, #9b00e5); /* Gradient background */
+            background: linear-gradient(45deg, #ff0077, #9b00e5);
             transition: transform 0.2s ease-in-out;
             outline: none;
+        }
+        .ul:hover .gpt-generate-btn {
+            display: flex; /* Ensures visibility on hover */
         }
         .gpt-generate-form h2 {
             font-size: 24px;
@@ -637,11 +659,6 @@
         }
     </style>
     <style>
-        .present-indicator {
-            color: #555;
-            font-weight: bold;
-            margin-left: 5px;
-        }
         .date-container {
             display: flex;
             align-items: center;
@@ -650,26 +667,134 @@
 
         .date-display {
             cursor: pointer;
-            font-size: 14px;
-            padding: 5px;
-            border: 1px dashed #ccc;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            display: inline-block;
-            color: #333;
+            color: black; /* Black text color */
+            text-decoration: none; /* Remove underline */
+            position: relative;
         }
 
-        .date-input {
+        .month-picker {
+            position: fixed;
+            background: white;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 5px;
-            font-size: 14px;
-            display: none;
-            width: 150px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1010;
+            width: 200px;
+            text-align: center;
+            cursor: default;
+            border-radius: 8px; /* Slightly rounded corners for a modern look */
         }
 
-        .date-input:focus {
-            outline: 2px solid #007bff;
+        .month-picker .year {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .month-picker .months {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .month-picker .month {
+            width: 45px;
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.1s ease-in-out; /* Smooth transition */
+            border-radius: 6px;
+            background-color: white; /* Default background */
+        }
+
+        .month-picker .month:hover {
+            background-color: #eaeefc; /* Soft pastel hover color */
+            color: #4a6ef5; /* Contrast text color */
+            transform: scale(1.1); /* Slight zoom effect */
+        }
+
+        .month-picker .actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .month-picker .action {
+            cursor: pointer;
+            font-size: 14px;
+            color: #4a6ef5; /* Soft blue for actions */
+            transition: color 0.1s ease-in-out; /* Smooth color transition */
+        }
+
+        .month-picker .action:hover {
+            color: #354bb7; /* Darker blue on hover */
+        }
+
+        .year span {
+            cursor: pointer;
+            transition: all 0.1s ease-in-out; /* Smooth transition for year navigation */
+        }
+
+        .year span:hover {
+            color: #4a6ef5; /* Match hover color for consistency */
+            transform: scale(1.2); /* Slight zoom effect */
+        }
+    </style>
+    <style>
+        #upgrade-alert {
+            background-color: #ffe5e5;
+            border: 1px solid #f5c2c2;
+            color: #a94442;
+            padding: 15px;
+            margin: 20px auto;
+            border-radius: 5px;
+            text-align: center;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        #upgrade-alert button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #upgrade-alert button:hover {
+            background-color: #0056b3;
+        }
+
+        #upgrade-alert span {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .university-entry .remove-button {
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            position: absolute;
+            color: rgb(255, 0, 0);
+            background: 0;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+        .university-entry .remove-button, .university-entry .add-button {
+            display: none; /* Hide the remove button by default */
+        }
+        .university-entry:hover .remove-button, .university-entry:hover .add-button {
+            display: inline-flex; /* Display the remove button when hovering over .section-title p */
         }
     </style>
 </head>
@@ -721,9 +846,11 @@
             </div>
         </div>
     </section>
-
+    
     <div id="editable-content" class="draggable">
-        <page size="A4" id="main-container"></page>
+        <page size="A4" id="main-container" class="page">
+
+        </page>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -801,23 +928,23 @@
             <div id="top-info" style="justify-content: center; display: flex; margin-bottom: 5mm;">
                 <div>
                     <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="NAME" style="font-weight: bold; font-size: 18px; margin-bottom: 2px; color: #043579; text-transform: uppercase; line-height: 1 !important;">NAME</p>
-                    <div style="display: flex; width: 100%;">
+                    <div style="display: flex; min-width: 100%;">
                         <table>
                             <tr>
                                 <th>Address</th>
-                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="Kuala Lumpur, Malaysia">Kuala Lumpur, Malaysia</p></td>
+                                <td style="min-width: 10cm; vertical-align: middle; display: flex; align-items: center; height:16px;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="Kuala Lumpur, Malaysia">Kuala Lumpur, Malaysia</p></td>
                             </tr>
                             <tr>
                                 <th>Mobile</th>
-                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="012-3456789">012-3456789</p></td>
+                                <td style="vertical-align: middle; display: flex; align-items: center; height:16px;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="012-3456789">012-3456789</p></td>
                             </tr>
                             <tr>
                                 <th>Email</th>
-                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="abc123@gmail.com">abc123@gmail.com</p></td>
+                                <td style="vertical-align: middle; display: flex; align-items: center; height:16px;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="abc123@gmail.com">abc123@gmail.com</p></td>
                             </tr>
                             <tr>
                                 <th>LinkedIn</th>
-                                <td style="vertical-align: middle; display: flex; align-items: center;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="https://www.linkedin.com/in/alibaba">https://www.linkedin.com/in/alibaba</p></td>
+                                <td style="vertical-align: middle; display: flex; align-items: center; height:16px;"><strong>:</strong> <p class="editable-text placeholder" style="line-height: 1 !important;" contenteditable="true" spellcheck="false" data-placeholder="https://www.linkedin.com/in/user123">https://www.linkedin.com/in/user123</p></td>
                             </tr>
                         </table>                       
                     </div>
@@ -825,13 +952,15 @@
             </div>
             
             <div id="objective" class="draggable-section section">
-                <div class="section-title">
+                <div class="section-title" style="display: flex;">
                     <p>OBJECTIVE</p>
+                    <button class="remove-button" data-tooltip="Remove section" onclick="removeObjectiveSection(this)"><i class="bi bi-x-circle"></i></button>
                 </div>
                 <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Experienced Regional Office Manager with over 13 years of expertise in driving operational efficiency, client satisfaction, and strategic improvements across cross-functional teams, achieving measurable results in cost reduction, brand growth, , and personnel management.">
                     Experienced Regional Office Manager with over 13 years of expertise in driving operational efficiency, client satisfaction, and strategic improvements across cross-functional teams, achieving measurable results in cost reduction, brand growth, , and personnel management.
                 </p>
             </div>
+
             <div id="work-experience" class="draggable-section section">
                 <div class="section-title" style="display: flex;">
                     <p>WORK&nbsp;EXPERIENCE</p>
@@ -843,20 +972,19 @@
                         <div style="max-width: 70%; min-width: 70%;">
                             <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
                         </div>
-                       <div class="date-container">
-        <strong>(</strong>
-        <div>
-            <span id="start-date-display" class="date-display">Start Date</span>
-            <input type="month" contenteditable="true" id="start-date" class="date-input">
-        </div>
-        <strong>-</strong>
-        <div>
-            <span id="end-date-display" class="date-display">End Date</span>
-            <input type="month" contenteditable="true" id="end-date" class="date-input">
-        </div>
-        <strong>)</strong>
-    </div>
-                        
+                        <div class="date-container">
+                            <strong>(</strong>
+                            <div>
+                                <span id="start-date-display-11" class="date-display" onclick="openMonthPicker('start', 11)">Start Date</span>
+                                <div id="start-month-picker-11" class="month-picker" style="display: none;"></div>
+                            </div>
+                            <strong>-</strong>
+                            <div>
+                                <span id="end-date-display-11" class="date-display" onclick="openMonthPicker('end', 11)">Present</span>
+                                <div id="end-month-picker-11" class="month-picker" style="display: none;"></div>
+                            </div>
+                            <strong>)</strong>
+                        </div>
                     </div>
                     <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
                     <ul class="ul" style="padding-left: 20px;">
@@ -903,8 +1031,8 @@
 
                 <!-- New Project Section with Padding -->
                 <div class="project">
-                    <strong>Project:</strong> <span class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project Name">Project Name</span>
-                    <ul style="padding-left: 20px;">
+                    <strong style="font-size: 12px;">Project : </strong> <span class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project Name">Project Name</span>
+                    <ul style="padding-left: 20px; padding-top: 5px;">
                         <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 1">Project bullet point 1</p></li>
                         <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 2">Project bullet point 2</p></li>
                         <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 3">Project bullet point 3</p></li>
@@ -916,33 +1044,34 @@
                 <div class="section-title" style="display: flex;">
                     <p>EDUCATIONAL&nbsp;BACKGROUND</p>
                     <button class="add-button" data-tooltip="Add university" onclick="addUniversity()"><i class="bi bi-plus-circle"></i></button>
+                    <button class="remove-button" data-tooltip="Remove section" onclick="removeUniversitySection(this)"><i class="bi bi-x-circle"></i></button>
                 </div>
                 <div style="display: flex; max-width: 100%; justify-content: space-between;">
                     <div style="max-width: 70%; min-width: 70%;">
                         <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="University" style="font-weight: bold;">University</p>
                     </div>
-                   <div class="date-container">
-        <strong>(</strong>
-        <div>
-            <span id="start-date-display" class="date-display">Start Date</span>
-            <input type="month" contenteditable="true" id="start-date" class="date-input">
-        </div>
-        <strong>-</strong>
-        <div>
-            <span id="end-date-display" class="date-display">End Date</span>
-            <input type="month" contenteditable="true" id="end-date" class="date-input">
-        </div>
-        <strong>)</strong>
-    </div>
+                    <div class="date-container">
+                        <strong>(</strong>
+                        <div>
+                            <span id="start-date-display-21" class="date-display" onclick="openMonthPicker('start', 21)">Start Date</span>
+                            <div id="start-month-picker-21" class="month-picker" style="display: none;"></div>
+                        </div>
+                        <strong>-</strong>
+                        <div>
+                            <span id="end-date-display-21" class="date-display" onclick="openMonthPicker('end', 21)">Present</span>
+                            <div id="end-month-picker-21" class="month-picker" style="display: none;"></div>
+                        </div>
+                        <strong>)</strong>
+                    </div>
                 </div>
                 <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Degree">Degree</p>
             </div>
-
 
             <div id="skills" class="draggable-section section">
                 <div class="section-title" style="display: flex;">
                     <p>SKILLS</p>
                     <button class="add-button" data-tooltip="Add skill" onclick="addSkillRow()"><i class="bi bi-plus-circle"></i></button>
+                    <button class="remove-button" data-tooltip="Remove section" onclick="removeUniversitySection(this)"><i class="bi bi-x-circle"></i></button>
                 </div>
                 <div class="skills-content">
                     <div class="skill-row">
@@ -1059,7 +1188,6 @@
                 .catch(error => console.error('Save content error:', error));
         }
 
-
         // Auto-save functionality (debounced to save after 1 second of inactivity)
         let saveTimeout;
 
@@ -1070,28 +1198,6 @@
 
         // Call attachEditableEvents on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', attachEditableEvents);
-
-        function saveDraft() {
-            const content = document.getElementById('main-container').innerHTML;
-            const documentId = new URLSearchParams(window.location.search).get('id');
-
-            fetch(`http://localhost:3000/save/${documentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    console.log('Draft saved successfully!');
-                } else {
-                    console.error('Error saving draft:', data.error);
-                }
-            })
-            .catch((error) => console.error('Error saving draft:', error));
-        }
 
         function handlePlaceholder(el) {
             el.addEventListener('focus', function () {
@@ -1281,127 +1387,8 @@
             });
         }
     </script>
-    <!-- remove section -->
+    <!-- gpt generate & month picker -->
     <script>
-        function removeWorkExperienceSection(button) {
-            // Find the closest parent with id 'work-experience' and remove it
-            const workExperienceSection = button.closest('#work-experience');
-            if (workExperienceSection) {
-                workExperienceSection.remove();
-            }
-        }
-    </script>
-    <!-- gpt generate -->
-    <script>
-        let workExperienceCounter = 0; // Start indexing from 0
-
-        function addWorkExperience() {
-            const workExperienceContainer = document.getElementById('work-experience');
-
-            const newWorkExperience = document.createElement('div');
-            newWorkExperience.className = 'work-experience-entry';
-            newWorkExperience.innerHTML = `
-                <div style="display: flex; max-width: 100%; justify-content: space-between;">
-                    <div style="max-width: 70%; min-width: 70%;">
-                        <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
-                    </div>
-                    <div style="width: 30%; display: flex; justify-content: end; align-items: center;">
-                        <strong>(</strong>
-                        <input type="text" class="date-input start-date" placeholder="Start Date">
-                        <strong>-</strong>
-                        <input type="text" class="date-input finish-date" placeholder="Finish Date">
-                        <strong>)</strong>
-                    </div>
-                </div>
-                <p class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
-                <ul>
-                    <li>
-                        <p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 1">Bullet point 1</p>
-                    </li>
-                </ul>
-            `;
-            workExperienceContainer.appendChild(newWorkExperience);
-
-            attachEditableEvents(); // Reattach listeners to new elements
-        }
-
-        function removeWorkExperience(index) {
-            const workExperienceContainer = document.getElementById('work-experience');
-            const workExperiences = workExperienceContainer.getElementsByClassName('work-experience-entry');
-
-            for (let i = 0; i < workExperiences.length; i++) {
-                if (parseInt(workExperiences[i].dataset.index) === index) {
-                    workExperienceContainer.removeChild(workExperiences[i]);
-                    break;
-                }
-            }
-
-            workExperienceCounter--;
-            reIndexWorkExperiences();
-        }
-
-        function reIndexWorkExperiences() {
-            const workExperienceContainer = document.getElementById('work-experience');
-            const workExperiences = workExperienceContainer.getElementsByClassName('work-experience-entry');
-
-            for (let i = 0; i < workExperiences.length; i++) {
-                workExperiences[i].dataset.index = i;
-                const removeButton = workExperiences[i].querySelector('.remove-button');
-                removeButton.setAttribute('onclick', `removeWorkExperience(${i})`);
-            }
-        }
-
-        function saveDatesToDatabase(startDate, endDate) {
-            // Save the dates to the database using an AJAX call or Fetch API
-            fetch('/save-dates', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ startDate, endDate }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Dates saved successfully!');
-            })
-            .catch(error => console.error('Error saving dates:', error));
-        }
-
-        // Auto-save function
-        function autoSaveChanges() {
-            const content = document.getElementById('main-container').innerHTML;
-            const pageElement = document.querySelector('page'); // The element to screenshot
-            const documentId = new URLSearchParams(window.location.search).get('id');
-
-            // Generate screenshot
-            html2canvas(pageElement).then((canvas) => {
-                const imageData = canvas.toDataURL('image/png'); // Convert canvas to base64 image
-
-                // Send content and screenshot to the backend
-                fetch(`/save/${documentId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ content, screenshot: imageData }),
-                })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        console.log('Content and screenshot saved successfully:', data);
-                    })
-                    .catch((error) => {
-                        console.error('Error saving content and screenshot:', error);
-                    });
-            });
-        }
-
-        // Initial call to add the first work experience if needed
-        document.addEventListener('DOMContentLoaded', function () {
-            if (document.getElementById('work-experience').children.length === 0) {
-                addWorkExperience();
-            }
-        });
-
         function showGptGenerateForm(id) {
             const form = document.getElementById(`gpt-generate-form-${id}`);
             form.style.display = 'block';
@@ -1410,14 +1397,9 @@
         function closeGptForm(id) {
             const form = document.getElementById(`gpt-generate-form-${id}`);
             form.style.display = 'none';
+            savePageContent();
         }
 
-        function removeWorkExperienceSection(button) {
-            const section = button.closest('.draggable-section');
-            if (section) {
-                section.remove();
-            }
-        }
 
         async function generateExperience(id) {
             const form = document.getElementById(`gpt-generate-form-${id}`);
@@ -1429,23 +1411,26 @@
                 return;
             }
 
-            // Show loading text
             const placeholderMessage = form.querySelector('#placeholder-message');
-            placeholderMessage.textContent = "Generating suggestions... Please wait.";
+            placeholderMessage.textContent = 'Generating suggestions... Please wait.';
 
             try {
                 const response = await fetch('/generate-gpt-suggestions', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         prompt: `Generate three bullet points for the role "${role}" based on the following summary: "${experienceSummary}". Each bullet point should be unique and highlight different aspects of the role.`,
                     }),
                 });
 
-                const data = await response.json();
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(errorData.error || 'An error occurred.');
+                    placeholderMessage.textContent = 'Error generating suggestions.';
+                    return;
+                }
 
+                const data = await response.json();
                 if (data && Array.isArray(data)) {
                     // Clear previous suggestions
                     const suggestionsContainer = form.querySelector('.suggestion-options');
@@ -1481,9 +1466,10 @@
                 } else {
                     placeholderMessage.textContent = "No suggestions found. Please try again.";
                 }
+
             } catch (error) {
                 console.error('Error generating experience descriptions:', error);
-                placeholderMessage.textContent = "Error occurred while generating suggestions.";
+                placeholderMessage.textContent = 'Error occurred while generating suggestions.';
             }
         }
 
@@ -1507,31 +1493,114 @@
                 }
             }
 
-            updateHtmlContentInDatabase(); // Update the entire HTML content in the database
+            savePageContent(); // Update the entire HTML content in the database
         }
 
-        // Function to update the entire html_content in the database
-        function updateHtmlContentInDatabase() {
-            const content = document.getElementById('main-container').innerHTML; // Get the updated HTML content
-            const documentId = new URLSearchParams(window.location.search).get('id');
+        let currentYear = new Date().getFullYear();
 
-            fetch(`/save/${documentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Content updated successfully!');
-                } else {
-                    console.error('Error updating content:', data.error);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        function openMonthPicker(type, counter) {
+            const monthPicker = document.getElementById(
+                type === 'start' ? `start-month-picker-${counter}` : `end-month-picker-${counter}`
+            );
+            const otherPicker = document.getElementById(
+                type === 'start' ? `end-month-picker-${counter}` : `start-month-picker-${counter}`
+            );
+
+            otherPicker.style.display = 'none'; // Close the other picker if open
+
+            if (monthPicker.innerHTML.trim() === '') {
+                generateMonthPicker(monthPicker, type, counter);
+            }
+            monthPicker.style.display = 'block';
         }
+
+        function generateMonthPicker(container, type, counter) {
+            container.innerHTML = `
+                <div class="year">
+                    <span onclick="changeYear(-1, '${type}', ${counter})"><</span>
+                    <span id="${type}-year-display-${counter}">${currentYear}</span>
+                    <span onclick="changeYear(1, '${type}', ${counter})">></span>
+                </div>
+                <div class="months">
+                    ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        .map((month, index) =>
+                            `<div class="month" onclick="selectMonth(${index}, '${type}', ${counter})">${month}</div>`
+                        )
+                        .join('')}
+                </div>
+                <div class="actions">
+                    <span class="action" onclick="clearDate('${type}', ${counter})">Clear</span>
+                    <span class="action" onclick="selectThisMonth('${type}', ${counter})">This Month</span>
+                </div>
+            `;
+        }
+
+        function changeYear(offset, type, counter) {
+            const yearDisplay = document.getElementById(`${type}-year-display-${counter}`);
+            currentYear = parseInt(yearDisplay.textContent) + offset;
+            yearDisplay.textContent = currentYear;
+        }
+
+        function selectMonth(monthIndex, type, counter) {
+            const displayElement = type === 'start'
+                ? document.getElementById(`start-date-display-${counter}`)
+                : document.getElementById(`end-date-display-${counter}`);
+
+            const monthName = new Date(currentYear, monthIndex).toLocaleString('default', { month: 'short' });
+            displayElement.textContent = `${monthName}, ${currentYear}`;
+
+            closeMonthPicker(type, counter);
+
+            if (type === 'end' && displayElement.textContent === 'Present') {
+                displayElement.textContent = 'Present';
+            }
+
+            savePageContent();
+        }
+
+        function clearDate(type, counter) {
+            const displayElement = type === 'start'
+                ? document.getElementById(`start-date-display-${counter}`)
+                : document.getElementById(`end-date-display-${counter}`);
+
+            if (type === 'end') {
+                displayElement.textContent = 'Present';
+            } else {
+                displayElement.textContent = 'Select Start Date';
+            }
+
+            closeMonthPicker(type, counter);
+            savePageContent();
+        }
+
+        function selectThisMonth(type, counter) {
+            const monthIndex = new Date().getMonth();
+            const year = new Date().getFullYear();
+
+            const monthName = new Date(year, monthIndex).toLocaleString('default', { month: 'short' });
+
+            const displayElement = type === 'start'
+                ? document.getElementById(`start-date-display-${counter}`)
+                : document.getElementById(`end-date-display-${counter}`);
+
+            displayElement.textContent = `${monthName}, ${year}`;
+            closeMonthPicker(type, counter);
+            savePageContent();
+        }
+
+        function closeMonthPicker(type, counter) {
+            const monthPicker = document.getElementById(
+                type === 'start' ? `start-month-picker-${counter}` : `end-month-picker-${counter}`
+            );
+            monthPicker.style.display = 'none';
+        }
+
+        // Close all month pickers when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.month-picker') && !event.target.closest('.date-display')) {
+                document.querySelectorAll('.month-picker').forEach(picker => picker.style.display = 'none');
+            }
+        });
 
     </script>
     <!-- save as jspdf -->
@@ -1566,6 +1635,7 @@
         // Attach the saveAsPDF function to a button click event
         document.getElementById('download-pdf').addEventListener('click', saveAsPDF);
     </script>
+    <!-- add + remove -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const container = document.getElementById('main-container');
@@ -1575,6 +1645,7 @@
                 dragClass: 'no-shadow-drag', // Apply no-shadow class while dragging
             });
         });
+
         function addSkillRow() {
             const skillsContainer = document.querySelector(".skills-content");
             const skillRow = document.createElement("div");
@@ -1585,59 +1656,309 @@
                 <button class="remove-button" data-tooltip="Remove" onclick="removeSkillRow(this)"><i class="bi bi-x-circle"></i></button>
             `;
             skillsContainer.appendChild(skillRow);
+            savePageContent();
         }
 
         function removeSkillRow(button) {
             button.closest(".skill-row").remove();
+            savePageContent();
+        }
+
+        function removeWorkExperienceSection(button) {
+            // Find the closest parent with id 'work-experience' and remove it
+            const workExperienceSection = button.closest('#work-experience');
+            if (workExperienceSection) {
+                workExperienceSection.remove();
+            }
+            savePageContent();
+        }
+
+        function removeObjectiveSection(button) {
+            // Find the closest parent with id 'work-experience' and remove it
+            const ObjectiveSection = button.closest('#objective');
+            if (ObjectiveSection) {
+                ObjectiveSection.remove();
+            }
+            savePageContent();
+        }
+
+        function removeUniversitySection(button) {
+            // Find the closest parent with id 'work-experience' and remove it
+            const UniversitySection = button.closest('#education');
+            if (UniversitySection) {
+                UniversitySection.remove();
+            }
+            savePageContent();
+        }
+
+        function removeSkillSection(button) {
+            // Find the closest parent with id 'work-experience' and remove it
+            const SkillSection = button.closest('#skills');
+            if (SkillSection) {
+                SkillSection.remove();
+            }
+            savePageContent();
+        }
+
+        let workExperienceCounter = 1; // Start indexing from 0
+
+        function addWorkExperience() {
+            // Dynamically calculate the next available ID
+            const workExperienceContainer = document.getElementById('work-experience');
+            const workExperienceEntries = workExperienceContainer.querySelectorAll('[id^="work"]'); // Select all elements with id starting with "work"
+            const newSection = document.createElement('div');
+
+            let maxId = 0;
+            workExperienceEntries.forEach(entry => {
+                const idNumber = parseInt(entry.id.replace('work', ''), 10); // Extract the number from the ID
+                if (!isNaN(idNumber) && idNumber > maxId) {
+                    maxId = idNumber;
+                }
+            });
+
+            // Set the counter to the next available ID
+            workExperienceCounter = maxId + 1;
+
+            const newWorkExperience = document.createElement('div');
+            newWorkExperience.className = 'work-experience-entry';
+            newWorkExperience.innerHTML = `
+                <div id="work${workExperienceCounter}">
+                    <div style="display: flex; max-width: 100%; justify-content: space-between;">
+                        <div style="max-width: 70%; min-width: 70%;">
+                            <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Company" style="font-weight: bold;">Company</p>
+                        </div>
+                        <div class="date-container">
+                            <strong>(</strong>
+                            <div>
+                                <span id="start-date-display-1${workExperienceCounter}" class="date-display" onclick="openMonthPicker('start', 1${workExperienceCounter})">Start Date</span>
+                                <div id="start-month-picker-1${workExperienceCounter}" class="month-picker" style="display: none;"></div>
+                            </div>
+                            <strong>-</strong>
+                            <div>
+                                <span id="end-date-display-1${workExperienceCounter}" class="date-display" onclick="openMonthPicker('end', 1${workExperienceCounter})">Present</span>
+                                <div id="end-month-picker-1${workExperienceCounter}" class="month-picker" style="display: none;"></div>
+                            </div>
+                            <strong>)</strong>
+                        </div>
+                    </div>
+                    <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Job title">Job title</p>
+                    <ul class="ul" style="padding-left: 20px;">
+                        <li>
+                            <p id="bullet-points-${workExperienceCounter}-1" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 1">Bullet point 1</p>
+                        </li>
+                        <li>
+                            <p id="bullet-points-${workExperienceCounter}-2" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 2">Bullet point 2</p>
+                        </li>
+                        <li>
+                            <p id="bullet-points-${workExperienceCounter}-3" class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Bullet point 3">Bullet point 3</p>
+                        </li>
+                        <button type="button" class="gpt-generate-btn" onclick="showGptGenerateForm(${workExperienceCounter})">AI Generate✨</button>
+                    </ul>
+                    <div class="gpt-generate-form" id="gpt-generate-form-${workExperienceCounter}" style="display:none;">
+                        <div style="padding: 20px;">
+                            <div class="form-header">
+                                <button class="close-btn" onclick="closeGptForm(${workExperienceCounter})">✕</button>
+                                <h1 style="font-size:30px; margin: 0;">Create work experience</h1>
+                            </div>
+                            <div class="form-group">
+                                <label for="role">What was your role?</label>
+                                <input type="text" class="role form-field" placeholder="e.g., Software Engineer">
+                            </div>
+                    
+                            <div class="form-group">
+                                <label for="experience-summary">Your work experience in one sentence:</label>
+                                <textarea class="experience-summary form-field" rows="2" placeholder="e.g., Led the development of a project to reduce manual tasks..."></textarea>
+                            </div>
+                    
+                            <div class="generate-btn-container">
+                                <button type="button" class="generate-btn" onclick="generateExperience(${workExperienceCounter})"><i class="fa-solid fa-bolt"></i> Generate</button>
+                            </div>
+                        </div>
+                
+                        <div class="gpt-suggestions">
+                            <div class="suggestion-options">
+                                <p id="placeholder-message" style="color: #888;">Please enter your role and work experience above</p>
+                                <!-- Generated suggestions with checkboxes will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Project Section with Padding -->
+                <div class="project">
+                    <strong>Project : </strong> <span class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project Name">Project Name</span>
+                    <ul style="padding-left: 20px; padding-top: 5px;">
+                        <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 1">Project bullet point 1</p></li>
+                        <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 2">Project bullet point 2</p></li>
+                        <li><p class="bullet-points placeholder" contenteditable="true" spellcheck="false" data-placeholder="Project bullet point 3">Project bullet point 3</p></li>
+                    </ul>
+                </div>
+            `;
+            workExperienceContainer.appendChild(newWorkExperience);
+
+            attachEditableEvents(); // Reattach listeners to new elements
+            savePageContent();
+            adjustPageHeight();
+        }
+
+        let universityCounter = 1; // Counter for dynamically created university sections
+
+        function addUniversity() {
+            const educationContainer = document.getElementById('education');
+            const educationEntries = educationContainer.querySelectorAll('[id^="university"]'); // Select all elements with id starting with "university"
+            const newSection = document.createElement('div');
+
+            // Dynamically calculate the next available ID
+            let maxId = 0;
+            educationEntries.forEach(entry => {
+                const idNumber = parseInt(entry.id.replace('university', ''), 10); // Extract the number from the ID
+                if (!isNaN(idNumber) && idNumber > maxId) {
+                    maxId = idNumber;
+                }
+            });
+
+            // Set the counter to the next available ID
+            universityCounter = maxId + 1;
+
+            newSection.id = `university${universityCounter}`;
+            newSection.className = 'university-entry';
+            newSection.style.maxWidth = '100%';
+            newSection.style.justifyContent = 'space-between';
+            newSection.innerHTML = `
+                <div style="display: flex; max-width: 100%; justify-content: space-between; margin-top:3px;">
+                    <div style="max-width: 70%; min-width: 70%;">
+                        <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="University" style="font-weight: bold;">University</p>
+                    </div>
+                    <button class="remove-button" data-tooltip="Remove University" onclick="removeUniversity(${universityCounter})"><i class="bi bi-x-circle"></i></button>
+                    <div class="date-container">
+                        <strong>(</strong>
+                        <div>
+                            <span id="start-date-display-2${universityCounter}" class="date-display" onclick="openMonthPicker('start', 2${universityCounter})">Start Date</span>
+                            <div id="start-month-picker-2${universityCounter}" class="month-picker" style="display: none;"></div>
+                        </div>
+                        <strong>-</strong>
+                        <div>
+                            <span id="end-date-display-2${universityCounter}" class="date-display" onclick="openMonthPicker('end', 2${universityCounter})">Present</span>
+                            <div id="end-month-picker-2${universityCounter}" class="month-picker" style="display: none;"></div>
+                        </div>
+                        <strong>)</strong>
+                    </div>
+                </div>
+                <p id="editable-text" class="editable-text placeholder" contenteditable="true" spellcheck="false" data-placeholder="Degree">Degree</p>
+            `;
+
+            educationContainer.appendChild(newSection);
+
+            attachEditableEvents(); // Reattach listeners to new elements
+            savePageContent(); // Save changes to the page
+            adjustPageHeight();
+        }
+
+        function removeUniversity(id) {
+            const university = document.getElementById(`university${id}`);
+            if (university) {
+                university.remove();
+                savePageContent(); // Save changes after removing
+            }
+        }
+    </script>
+    <!-- alert to upgrade plan -->
+    <script>
+        function showUpgradeAlert() {
+            // Check if an alert already exists to avoid duplicates
+            let existingAlert = document.getElementById('upgrade-alert');
+            if (existingAlert) return;
+
+            // Create the alert container
+            const alertContainer = document.createElement('div');
+            alertContainer.id = 'upgrade-alert';
+            alertContainer.style.cssText = `
+                background-color: #ffe5e5;
+                border: 1px solid #f5c2c2;
+                color: #a94442;
+                padding: 15px;
+                margin: 20px auto;
+                border-radius: 5px;
+                text-align: center;
+                width: 80%;
+                max-width: 500px;
+                position: relative;
+            `;
+
+            // Add alert message
+            const message = document.createElement('p');
+            message.textContent = 'No prompts remaining. Please upgrade your plan to continue.';
+            alertContainer.appendChild(message);
+
+            // Add "Upgrade Now" button
+            const upgradeButton = document.createElement('button');
+            upgradeButton.textContent = 'Upgrade Now';
+            upgradeButton.style.cssText = `
+                background-color: #007bff;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 10px;
+            `;
+            upgradeButton.onclick = function () {
+                window.location.href = '/'; // Redirect to the upgrade page
+            };
+            alertContainer.appendChild(upgradeButton);
+
+            // Add a close button
+            const closeButton = document.createElement('span');
+            closeButton.textContent = '×';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                cursor: pointer;
+                font-size: 20px;
+            `;
+            closeButton.onclick = function () {
+                alertContainer.remove(); // Remove the alert when close button is clicked
+            };
+            alertContainer.appendChild(closeButton);
+
+            // Append the alert container to the body or a specific container
+            const mainContainer = document.getElementById('main-container') || document.body;
+            mainContainer.prepend(alertContainer);
         }
 
     </script>
-
-
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        const startDateInput = document.getElementById('start-date');
-        const endDateInput = document.getElementById('end-date');
-        const startDateDisplay = document.getElementById('start-date-display');
-        const endDateDisplay = document.getElementById('end-date-display');
+        function adjustPageHeight() {
+            const pages = document.querySelectorAll('.page');
+            const defaultHeight = 297 * 3.78; // A4 height in pixels at 96 DPI
 
-        function handleDateChange(input, display) {
-            input.addEventListener('change', function () {
-                const selectedDate = input.value;
-                if (selectedDate) {
-                    const formattedDate = new Date(selectedDate + '-01').toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                    });
-                    display.textContent = formattedDate;
-                } else {
-                    display.textContent = 'Select Date';
+            pages.forEach((page) => {
+                const contentHeight = page.scrollHeight;
+
+                // Check if content exceeds default height
+                if (contentHeight > defaultHeight) {
+                    const newHeight = Math.ceil(contentHeight); // Add 10mm padding
+                    page.style.height = `${newHeight}px`; // Set new height dynamically
+                    console.log(`Page extended to ${newHeight}px`);
+
+                    // Add dotted line at the default height to indicate A4 boundary
+                    const dottedLine = page.querySelector('.dotted-line') || document.createElement('div');
+                    dottedLine.className = 'dotted-line';
+                    dottedLine.style.position = 'absolute';
+                    dottedLine.style.top = `${defaultHeight}px`;
+                    dottedLine.style.left = '0';
+                    dottedLine.style.width = '100%';
+                    dottedLine.style.borderTop = '1px dashed black';
+                    page.appendChild(dottedLine);
                 }
-                input.style.display = 'none';
-                display.style.display = 'inline-block';
-            });
-
-            input.addEventListener('blur', function () {
-                input.style.display = 'none';
-                display.style.display = 'inline-block';
             });
         }
 
-        function handleClick(display, input) {
-            display.addEventListener('click', function () {
-                display.style.display = 'none';
-                input.style.display = 'inline-block';
-                input.focus();
-            });
-        }
-
-        handleDateChange(startDateInput, startDateDisplay);
-        handleDateChange(endDateInput, endDateDisplay);
-
-        handleClick(startDateDisplay, startDateInput);
-        handleClick(endDateDisplay, endDateInput);
-    });
-
+        // Call this function after any content is added or modified
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustPageHeight();
+        });
     </script>
 </body>
 </html>

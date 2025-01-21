@@ -33,7 +33,16 @@
   justify-content: center;
   align-items: stretch;
   max-width: 340px;
-  height: 100vh;
+  height: 80vh;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+}
+.w-users-userformpagewrap1 {
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 340px;
   margin-left: auto;
   margin-right: auto;
   display: flex;

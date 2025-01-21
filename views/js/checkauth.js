@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.authenticated) {
+                console.log(data.authenticated)
                 document.getElementById('login-button').style.display = 'none';
                 document.getElementById('signup-button').style.display = 'none';
                 document.getElementById('logout-button').style.display = 'block';

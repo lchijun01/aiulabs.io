@@ -619,70 +619,70 @@
         };
 
         function loadDocumentList() {
-    fetch('http://localhost:3000/documents')
-    .then(response => response.json())
-    .then(data => {
-        const documentList = document.getElementById('document-list');
-        documentList.innerHTML = ''; // Clear the list before loading
+            fetch('/documents')
+            .then(response => response.json())
+            .then(data => {
+                const documentList = document.getElementById('document-list');
+                documentList.innerHTML = ''; // Clear the list before loading
 
-            data.forEach(doc => {
-                const listItem = document.createElement('li');
-                listItem.className = 'file-box';
+                    data.forEach(doc => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'file-box';
 
-                // Image preview container for zoomed-in effect
-                const zoomPreview = document.createElement('div');
-                zoomPreview.className = 'zoom-preview';
+                        // Image preview container for zoomed-in effect
+                        const zoomPreview = document.createElement('div');
+                        zoomPreview.className = 'zoom-preview';
 
-                // Image preview
-                const docImage = document.createElement('img');
-                docImage.src = doc.preview_image_path || 'screenshots/1736660563524.jpg'; // Default image
-                docImage.alt = 'Resume Preview';
-                docImage.addEventListener('click', () => openDocument(doc.id));
+                        // Image preview
+                        const docImage = document.createElement('img');
+                        docImage.src = doc.preview_image_path || 'screenshots/1736798414816.jpg'; // Default image
+                        docImage.alt = 'Resume Preview';
+                        docImage.addEventListener('click', () => openDocument(doc.id));
 
-                zoomPreview.appendChild(docImage); // Wrap the image in the zoom container
-                listItem.appendChild(zoomPreview);
+                        zoomPreview.appendChild(docImage); // Wrap the image in the zoom container
+                        listItem.appendChild(zoomPreview);
 
-                const textContainer = document.createElement('div');
-                textContainer.className = 'text-container';
+                        const textContainer = document.createElement('div');
+                        textContainer.className = 'text-container';
 
-                // Truncated file name
-                const fileName = document.createElement('h4');
-                fileName.className = 'file-name'; // Add CSS class for styling
-                fileName.textContent =
-                    doc.title.length > 10 ? `${doc.title.substring(0, 10)}...` : doc.title;
+                        // Truncated file name
+                        const fileName = document.createElement('h4');
+                        fileName.className = 'file-name'; // Add CSS class for styling
+                        fileName.textContent =
+                            doc.title.length > 10 ? `${doc.title.substring(0, 10)}...` : doc.title;
 
-                // Add title attribute for native browser tooltip
-                fileName.setAttribute('title', doc.title);
+                        // Add title attribute for native browser tooltip
+                        fileName.setAttribute('title', doc.title);
 
-                textContainer.appendChild(fileName);
+                        textContainer.appendChild(fileName);
 
-                const fileDate = document.createElement('p');
-                fileDate.className = 'file-date';
-                fileDate.textContent = new Date(doc.updated_at).toLocaleDateString();
-                textContainer.appendChild(fileDate);
+                        const fileDate = document.createElement('p');
+                        fileDate.className = 'file-date';
+                        fileDate.textContent = new Date(doc.updated_at).toLocaleDateString();
+                        textContainer.appendChild(fileDate);
 
-                listItem.appendChild(textContainer);
+                        listItem.appendChild(textContainer);
 
-                // Kebab menu
-                const ellipsisWrapper = document.createElement('div');
-                ellipsisWrapper.className = 'ellipsis-icon-wrapper';
-                ellipsisWrapper.innerHTML = '<i class="fa fa-ellipsis-v ellipsis-icon"></i>';
+                        // Kebab menu
+                        const ellipsisWrapper = document.createElement('div');
+                        ellipsisWrapper.className = 'ellipsis-icon-wrapper';
+                        ellipsisWrapper.innerHTML = '<i class="fa fa-ellipsis-v ellipsis-icon"></i>';
 
-                const optionsMenu = document.createElement('div');
-                optionsMenu.className = 'options-menu';
-                optionsMenu.innerHTML = `
-                    <a onclick="duplicateDocument('${doc.id}')"><i class="fa fa-copy"></i> Duplicate</a>
-                    <a onclick="removeDocument('${doc.id}')"><i class="fa fa-trash"></i> Delete</a>
-                `;
+                        const optionsMenu = document.createElement('div');
+                        optionsMenu.className = 'options-menu';
+                        optionsMenu.innerHTML = `
+                            <a onclick="duplicateDocument('${doc.id}')"><i class="fa fa-copy"></i> Duplicate</a>
+                            <a onclick="removeDocument('${doc.id}')"><i class="fa fa-trash"></i> Delete</a>
+                        `;
 
-                ellipsisWrapper.appendChild(optionsMenu);
-                listItem.appendChild(ellipsisWrapper);
+                        ellipsisWrapper.appendChild(optionsMenu);
+                        listItem.appendChild(ellipsisWrapper);
 
-                documentList.appendChild(listItem);
-            });
-        })
-        .catch(error => console.error('Error loading documents:', error));
-}
+                        documentList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error loading documents:', error));
+        }
 
         function duplicateDocument(id) {
             fetch(`/duplicate/${id}`, { method: 'POST' })
@@ -714,7 +714,7 @@
 
         function createNewDocument() {
             const title = 'Untitled';  // Set the default title to "Untitled"
-            fetch('http://localhost:3000/create', {
+            fetch('/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -734,7 +734,7 @@
 
         function removeDocument(documentId) {
             if (confirm('Are you sure you want to delete this document?')) {
-                fetch(`http://localhost:3000/remove/${documentId}`, {  // Changed from /delete/ to /remove/
+                fetch(`/remove/${documentId}`, {  // Changed from /delete/ to /remove/
                     method: 'DELETE',
                 })
                 .then(response => {
@@ -892,74 +892,74 @@
         }
 
         async function saveChanges() {
-    const data = {};
+            const data = {};
 
-    // Collect data from editable fields
-    document.querySelectorAll('.editable').forEach((span) => {
-        const value = span.innerText.trim();
-        data[span.id] = value || null; // Set empty fields to null
-        span.setAttribute('contenteditable', 'false'); // Disable editing
-        span.classList.remove('editing'); // Remove editing style
-    });
+            // Collect data from editable fields
+            document.querySelectorAll('.editable').forEach((span) => {
+                const value = span.innerText.trim();
+                data[span.id] = value || null; // Set empty fields to null
+                span.setAttribute('contenteditable', 'false'); // Disable editing
+                span.classList.remove('editing'); // Remove editing style
+            });
 
-    // Validate LinkedIn URL
-    const linkedin = data['linkedin'];
-    const linkedinRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
-    if (linkedin && !linkedinRegex.test(linkedin)) {
-        alert('Please enter a valid LinkedIn profile URL.');
-        // Re-enable editing for LinkedIn field
-        const linkedinField = document.getElementById('linkedin');
-        if (linkedinField) {
-            linkedinField.setAttribute('contenteditable', 'true');
-            linkedinField.classList.add('editing');
-        }
-        return; // Stop saving changes if LinkedIn URL is invalid
-    }
-
-    // Find the status message container
-    const statusMessage = document.getElementById('status-message');
-    if (statusMessage) statusMessage.textContent = ''; // Clear previous messages
-
-    try {
-        const response = await fetch('/update-profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            if (statusMessage) {
-                statusMessage.textContent = 'Changes saved successfully!';
-                statusMessage.style.color = 'green';
-            }
-            originalData = { ...data }; // Update originalData
-
-            // Display LinkedIn as a clickable link if valid
-            if (linkedin) {
+            // Validate LinkedIn URL
+            const linkedin = data['linkedin'];
+            const linkedinRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+            if (linkedin && !linkedinRegex.test(linkedin)) {
+                alert('Please enter a valid LinkedIn profile URL.');
+                // Re-enable editing for LinkedIn field
                 const linkedinField = document.getElementById('linkedin');
-                linkedinField.innerHTML = `<a href="${linkedin}" target="_blank">${linkedin}</a>`;
+                if (linkedinField) {
+                    linkedinField.setAttribute('contenteditable', 'true');
+                    linkedinField.classList.add('editing');
+                }
+                return; // Stop saving changes if LinkedIn URL is invalid
             }
-        } else {
-            if (statusMessage) {
-                statusMessage.textContent = 'Failed to save changes.';
-                statusMessage.style.color = 'red';
-            }
-        }
-    } catch (error) {
-        console.error('Error saving changes:', error);
-        if (statusMessage) {
-            statusMessage.textContent = 'An error occurred while saving changes. Please try again.';
-            statusMessage.style.color = 'red';
-        }
-    }
 
-    // Restore button visibility
-    document.querySelector('.edit-btn').classList.remove('hidden');
-    document.getElementById('save-btn').classList.add('hidden');
-    document.getElementById('cancel-btn').classList.add('hidden');
-}
+            // Find the status message container
+            const statusMessage = document.getElementById('status-message');
+            if (statusMessage) statusMessage.textContent = ''; // Clear previous messages
+
+            try {
+                const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Changes saved successfully!';
+                        statusMessage.style.color = 'green';
+                    }
+                    originalData = { ...data }; // Update originalData
+
+                    // Display LinkedIn as a clickable link if valid
+                    if (linkedin) {
+                        const linkedinField = document.getElementById('linkedin');
+                        linkedinField.innerHTML = `<a href="${linkedin}" target="_blank">${linkedin}</a>`;
+                    }
+                } else {
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Failed to save changes.';
+                        statusMessage.style.color = 'red';
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving changes:', error);
+                if (statusMessage) {
+                    statusMessage.textContent = 'An error occurred while saving changes. Please try again.';
+                    statusMessage.style.color = 'red';
+                }
+            }
+
+            // Restore button visibility
+            document.querySelector('.edit-btn').classList.remove('hidden');
+            document.getElementById('save-btn').classList.add('hidden');
+            document.getElementById('cancel-btn').classList.add('hidden');
+        }
 
         function closePopup() {
             const overlay = document.getElementById('overlay');
