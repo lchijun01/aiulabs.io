@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #qrcode {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #saveBtn {
+            display: none; /* Initially hide the save button */
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Generator</h1>
+    <p>Enter a link below to generate its QR code:</p>
+    <input type="text" id="linkInput" placeholder="Enter your link here">
+    <button onclick="generateQRCode()">Generate QR Code</button>
+    <button id="saveBtn" onclick="saveQRCode()">Save QR Code</button>
+    <div id="qrcode"></div>
+
+    <!-- Include QRCode.js -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        let qrCodeCanvas; // To store the generated QR code as a canvas element
+
+        function generateQRCode() {
+            const link = document.getElementById('linkInput').value.trim();
+
+            // Clear previous QR code
+            const qrCodeContainer = document.getElementById('qrcode');
+            qrCodeContainer.innerHTML = ""; // Ensure it's a clean div
+            document.getElementById('saveBtn').style.display = "none"; // Hide save button initially
+
+            if (!link) {
+                alert("Please enter a valid link!");
+                return;
+            }
+
+            // Generate the QR code
+            const qrCode = new QRCode(qrCodeContainer, {
+                text: link,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Convert QR Code to Canvas for HD export
+            setTimeout(() => {
+                qrCodeCanvas = qrCodeContainer.querySelector("canvas");
+                if (qrCodeCanvas) {
+                    document.getElementById('saveBtn').style.display = "inline-block"; // Show save button
+                }
+            }, 500); // Wait for QR Code generation
+        }
+
+        function saveQRCode() {
+            if (!qrCodeCanvas) return;
+
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.download = 'qrcode.png'; // Set the file name
+
+            // Convert the canvas to a data URL (HD resolution)
+            const hdCanvas = document.createElement('canvas');
+            const hdContext = hdCanvas.getContext('2d');
+
+            // Set HD dimensions (4x the original size)
+            hdCanvas.width = qrCodeCanvas.width * 4;
+            hdCanvas.height = qrCodeCanvas.height * 4;
+            hdContext.scale(4, 4);
+
+            // Draw the original canvas onto the HD canvas
+            hdContext.drawImage(qrCodeCanvas, 0, 0);
+
+            // Set the link to the HD image data
+            link.href = hdCanvas.toDataURL('image/png');
+            link.click(); // Trigger the download
+        }
+    </script>
+</body>
+</html>
