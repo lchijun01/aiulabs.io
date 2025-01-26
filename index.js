@@ -46,7 +46,7 @@ function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     } else {
-        res.redirect('/access-denied');
+        res.redirect('/loginFirst');
     }
 }
 // Webhook endpoint must use raw body for Stripe signature verification
@@ -1231,34 +1231,275 @@ app.post('/save-screenshot/:id', async (req, res) => {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Resume</title>
-                <link rel="stylesheet" href="${cssPath}">
                 <style>
+                    @font-face { 
+                        font-family: 'Calibri'; 
+                        src: url('/views/fonts/Calibri.woff2') format('woff2'), 
+                            url('/views/fonts/Calibri.woff') format('woff'); 
+                        font-weight: normal; 
+                        font-style: normal; 
+                    } 
+                    * {
+                        margin: 0;
+                    }
+                    body {
+                        font-family: helvetica, sans-serif;
+                        background-color: #333144;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    [contenteditable] {
+                        line-height: 1.5; /* Apply line height only to editable content */
+                    }
+                    ul {
+                        padding-left: 20px;
+                        position: relative;
+                    }
+                    .container {
+                        width: 210mm; /* A4 width */
+                        height: 297mm; /* A4 height */
+                        margin: 0 auto; /* Center the container */
+                        background: #fff;
+                        padding: 10mm; /* Add padding in mm for consistency */
+                        border-radius: 10px;
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                        overflow: visible; /* Ensure content doesn't overflow */
+                        box-sizing: border-box; /* Include padding in total size */
+                        position: relative;
+                    }
+                    .section {
+                        margin-bottom: 15px;
+                    }
+                    .section-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        border-bottom: 1px solid #2d2d2d;
+                    }
+                    .section-title {
+                        font-size: 14px;
+                        font-weight: bold;
+                        color: #2A4879; /* Standard dark blue */
+                        margin: 0;
+                        cursor: default;
+                        line-height: 1.5;
+                    }
+                    .drag-handle {
+                        cursor: grab;
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        width: 20px;
+                        height: 20px;
+                    }
+                    .drag-handle::before {
+                        content: "⋮⋮";
+                        font-size: 16px;
+                        color: #666;
+                    }
+                    .drag-handle1 {
+                        cursor: grab;
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        width: 20px;
+                        height: 20px;
+                    }
+                    .drag-handle1::before {
+                        content: "⋮⋮";
+                        font-size: 16px;
+                        color: #666;
+                    }
+                    .content {
+                        font-size: 11px;
+                    }
+                    .placeholder {
+                        color: #cecece !important; /* Placeholder text color */
+                    }
+                    .editable-text {
+                        width: 85%;
+                        border-bottom: 1px solid transparent !important; /* Default state */
+                        transition: background-color 0.3s, border-bottom-color 0.3s;
+                        outline: none;
+                        color: #000; /* Default text color */
+                        outline: none;
+                        border: none;
+                    }
+                    .editable-text:focus {
+                        background-color: #fef0ff;
+                        border-bottom-color: #580067 !important;
+                        outline: none;
+                    }
+                    /* Top-Info & Image */
+                    .top-info {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: left;
+                        margin-bottom: 15px;
+                    }
+                    .image-box {
+                        width: 90px;
+                        height: 116px;
+                        border: 1px solid #ccc;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 15px;
+                        overflow: hidden;
+                        cursor: pointer;
+                        text-align: center;
+                    }
+                    .image-box img {
+                        width: 100%;
+                        height: 100%;
+                    }
+                    .info-text {
+                        font-size: 12px;
+                    }
+                    .info-text table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .info-text .label {
+                        text-align: left;
+                        font-weight: bold;
+                        font-size: 12px;
+                        white-space: nowrap;
+                        padding-right: 5px;
+                    }
+                    .info-text .separator {
+                        text-align: center;
+                        font-weight: bold;
+                        font-size: 12px;
+                        width: 10px;
+                    }
+                    .info-text .value {
+                        text-align: left;
+                        font-size: 12px;
+                        word-wrap: break-word;
+                        width: 100%;
+                    }
+                    .content {
+                        margin: 1mm 0 2mm 0;
+                    }
+                    /* Style the ghost element during dragging */
+                    .dragging-ghost {
+                        height: 30px;
+                        overflow: hidden;
+                        background: #f5f5f5;
+                        border: 1px solid #ddd;
+                        box-shadow: none;
+                    }
+                    .dragging-ghost .content {
+                        display: none;
+                    }
+                    .skills-content {
+                        display: table;
+                        width: 100%;
+                    }
+                    .skill-row {
+                        width: 100%;
+                        display: flex;
+                        padding-right: 20%;
+                        margin-bottom: 1px;
+                        line-height: 1.5;
+                    }
+                    .skill-category {
+                        display: table-cell;
+                        font-size: 11px;
+                        font-weight: bold;
+                        text-align: left;
+                        white-space: normal; /* Allow wrapping */
+                        word-wrap: break-word; /* Break long words */
+                        padding-right: 10px;
+                        width: 20mm;
+                    }
+                    .skill-detail {
+                        width: calc((190mm * 0.85) - 20mm - 15px);
+                        display: table-cell;
+                        font-size: 11px;
+                        white-space: normal; /* Allow wrapping */
+                        word-wrap: break-word; /* Break long words */
+                        text-align: left;
+                        padding-left: 5px;
+
+                    }
+                    .skill-row:hover .remove-button {
+                        display: inline-block;
+                    }
+                    .research-row {
+                        width: 100%;
+                        display: flex;
+                        padding-right: 20%;
+                    }
+                    .research-row:hover .remove-button {
+                        display: inline-block;
+                    }
+                    .leadership-row {
+                        width: 100%;
+                        display: flex;
+                        padding-right: 20%;
+                    }
+                    .leadership-row:hover .remove-button {
+                        display: inline-block;
+                    }
+                    .award-row {
+                        width: 100%;
+                        display: flex;
+                        padding-right: 20%;
+                    }
+                    .award-row:hover .remove-button {
+                        display: inline-block;
+                    }
+                    .value a {
+                        color: #007bff; /* Link color */
+                        text-decoration: none; /* Remove underline */
+                    }
+                    .value a:hover {
+                        text-decoration: underline; /* Add underline on hover */
+                    }
+                    .pagination-line {
+                        width: 100%;
+                        border-top: 1px dashed #ddd;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #666;
+                        position: absolute;
+                        left: 0;
+                        text-align: left;
+                    }
+                    .pagination-line span {
+                        position: relative;
+                        left: -15mm;
+                        padding: 0 5px;
+                        font-weight: bold;
+                    }
+                    /* Date picker */
                     .date-container {
                         display: flex;
                         align-items: center;
-                        gap: 10px;
+                        gap: 3px;
+                        font-weight: bold;
                     }
-
                     .date-display {
                         cursor: pointer;
                         color: black; /* Black text color */
                         text-decoration: none; /* Remove underline */
                         position: relative;
                     }
-
                     .month-picker {
-                        position: fixed;
+                        position: absolute;
                         background: white;
                         border: 1px solid #ccc;
                         padding: 10px;
                         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                        z-index: 1010;
                         width: 200px;
                         text-align: center;
                         cursor: default;
                         border-radius: 8px; /* Slightly rounded corners for a modern look */
+                        z-index: 2;
                     }
-
                     .month-picker .year {
                         display: flex;
                         justify-content: space-between;
@@ -1266,14 +1507,12 @@ app.post('/save-screenshot/:id', async (req, res) => {
                         font-size: 16px;
                         margin-bottom: 10px;
                     }
-
                     .month-picker .months {
                         display: flex;
                         flex-wrap: wrap;
                         gap: 5px;
                         justify-content: center;
                     }
-
                     .month-picker .month {
                         width: 45px;
                         padding: 5px;
@@ -1283,45 +1522,670 @@ app.post('/save-screenshot/:id', async (req, res) => {
                         border-radius: 6px;
                         background-color: white; /* Default background */
                     }
-
                     .month-picker .month:hover {
                         background-color: #eaeefc; /* Soft pastel hover color */
                         color: #4a6ef5; /* Contrast text color */
                         transform: scale(1.1); /* Slight zoom effect */
                     }
-
                     .month-picker .actions {
                         margin-top: 10px;
                         display: flex;
                         justify-content: space-between;
                     }
-
                     .month-picker .action {
                         cursor: pointer;
                         font-size: 14px;
                         color: #4a6ef5; /* Soft blue for actions */
                         transition: color 0.1s ease-in-out; /* Smooth color transition */
                     }
-
                     .month-picker .action:hover {
                         color: #354bb7; /* Darker blue on hover */
                     }
-
                     .year span {
                         cursor: pointer;
                         transition: all 0.1s ease-in-out; /* Smooth transition for year navigation */
                     }
-
                     .year span:hover {
                         color: #4a6ef5; /* Match hover color for consistency */
                         transform: scale(1.2); /* Slight zoom effect */
                     }
+                    .year-picker {
+                        position: absolute;
+                        background: white;
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                        width: 200px;
+                        text-align: center;
+                        cursor: default;
+                        border-radius: 8px; /* Rounded corners */
+                        z-index: 2;
+                    }
+                    .year-picker .year-navigation {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                        font-weight: bold;
+                    }
+                    .year-picker .year-navigation span {
+                        cursor: pointer;
+                        transition: color 0.2s ease-in-out;
+                        color: black; /* Blue for navigation arrows */
+                        cursor: pointer;
+                        transition: all 0.1s ease-in-out;
+                    }
+                    .year-picker .year-navigation span:hover {
+                        color: #354bb7; /* Darker blue on hover */
+                        color: #4a6ef5; /* Match hover color for consistency */
+                        transform: scale(1.2); /* Slight zoom effect */
+                    }
+                    .year-picker .years {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 5px;
+                        justify-content: center;
+                        font-size: 14px;
+                    }
+                    .year-picker .year {
+                        width: 45px;
+                        padding: 5px;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.1s ease-in-out;
+                        border-radius: 6px;
+                        background-color: white; /* Default background */
+                    }
+                    .year-picker .year:hover {
+                        background-color: #eaeefc; /* Soft pastel hover color */
+                        color: #4a6ef5; /* Contrast text color */
+                        transform: scale(1.1); /* Slight zoom effect */
+                    }
+                    .year-picker .actions {
+                        margin-top: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .year-picker .action {
+                        cursor: pointer;
+                        font-size: 14px;
+                        color: #4a6ef5; /* Soft blue for actions */
+                        transition: color 0.1s ease-in-out;
+                    }
+                    .year-picker .action:hover {
+                        color: #354bb7; /* Darker blue on hover */
+                    }
+                    /* Add more button */
+                    .add-button {
+                        border: none;
+                        cursor: pointer;
+                        text-align: center;
+                        display: none;
+                        position: relative;
+                        color: grey;
+                        background: 0;
+                        align-items: center;
+                        margin-left: 2mm;
+                    }
+                    .add-button:hover::after {
+                        content: attr(data-tooltip);
+                        position: absolute;
+                        bottom: 100%; /* Position above the button */
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #1a1a1a;
+                        color: #fff;
+                        padding: 5px;
+                        border-radius: 5px;
+                        white-space: nowrap;
+                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                        font-size: 12px;
+                        opacity: 1;
+                        z-index: 10;
+                    }
+                    .remove-button {
+                        border: none;
+                        cursor: pointer;
+                        text-align: center;
+                        display: none;
+                        position: relative;
+                        color: rgb(255, 0, 0);
+                        background: 0;
+                        align-items: center;
+                        margin-left: 2mm;
+                    }
+                    .remove-button:hover::after {
+                        content: attr(data-tooltip);
+                        position: absolute;
+                        bottom: 100%;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #1a1a1a;
+                        color: #fff;
+                        padding: 5px;
+                        border-radius: 5px;
+                        white-space: nowrap;
+                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                        font-size: 12px;
+                        opacity: 1;
+                        z-index: 10;
+                    }
+                    .section-title .remove-button, .section-title .add-button {
+                        display: none; /* Hide the remove button by default */
+                    }
+                    .section-title:hover .remove-button, .section-title:hover .add-button {
+                        display: inline-block; /* Display the remove button when hovering over .section-title p */
+                    }
+                    .add-project-button {
+                        border: none;
+                        cursor: pointer;
+                        text-align: center;
+                        display: inline-block;
+                        position: relative;
+                        color: grey;
+                        background: 0;
+                        align-items: center;
+                        margin-left: 2mm;
+                    }
+                    .add-project-button:hover::after {
+                        content: attr(data-tooltip);
+                        position: absolute;
+                        bottom: 100%; /* Position above the button */
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #1a1a1a;
+                        color: #fff;
+                        padding: 5px;
+                        border-radius: 5px;
+                        white-space: nowrap;
+                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                        font-size: 12px;
+                        opacity: 1;
+                        z-index: 10;
+                    }
+
+                    .add-button1 {
+                        border: none;
+                        cursor: pointer;
+                        text-align: center;
+                        position: absolute;
+                        color: grey;
+                        background: 0;
+                        align-items: center;
+                        margin-left: 2mm;
+                        left: 0;
+                    }
+                    .add-button1:hover::after {
+                        content: attr(data-tooltip);
+                        position: absolute;
+                        bottom: 100%; /* Position above the button */
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #1a1a1a;
+                        color: #fff;
+                        padding: 5px;
+                        border-radius: 5px;
+                        white-space: nowrap;
+                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                        font-size: 12px;
+                        opacity: 1;
+                        z-index: 10;
+                    }
+                    .remove-button1 {
+                        border: none;
+                        cursor: pointer;
+                        text-align: center;
+                        position: absolute;
+                        color: rgb(255, 0, 0);
+                        background: 0;
+                        align-items: center;
+                        margin-left: 2mm;
+                        right: 5px;
+                    }
+                    .remove-button1:hover::after {
+                        content: attr(data-tooltip);
+                        position: absolute;
+                        bottom: 100%;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #1a1a1a;
+                        color: #fff;
+                        padding: 5px;
+                        border-radius: 5px;
+                        white-space: nowrap;
+                        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                        font-size: 12px;
+                        opacity: 1;
+                        z-index: 10;
+                    }
+                    /* Ruler */
+                    .sets {
+                        display: flex;
+                        margin-left: 5px;
+                        padding-left: 5px;
+                    }
+                    .sets button {
+                        background-color: transparent;
+                        border: 0;
+                        cursor: pointer;
+                        padding: 2mm 3mm;
+                        color: white;
+                    }
+                    .sets button:hover {
+                        background-color: #272636;
+                    }
+                    .sets select {
+                        padding: 2mm 3mm;
+                        background-color: transparent;
+                        border: 0;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        color: white;
+                    }
+                    .sets select:hover {
+                        background-color: #272636;
+                    }
+                    .sets select:hover  option{
+                        background-color: #272636;
+                    }
+                    .button-container {
+                        width: 100px;
+                    }
+                    .button-container button {
+                        border: 0;
+                        border-radius: 5px;
+                        background-color: rgb(226, 210, 242);
+                        width: 100px;
+                        height: 40px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    }
+                    .button-container p {
+                        width: auto;
+                        max-width: 200px;
+                        position: absolute;
+                        border: 0;
+                        top: 10px;
+                        left: 10%;
+                        font-weight: bold;
+                        cursor: pointer;
+                        text-align: center;
+                        font-size: 20px;
+                        border-bottom: 1px solid black !important;
+                        color: black !important;
+                        padding: 2mm;
+                    }
+                    .draggable-section {
+                        padding: 1mm 0;
+                        margin-bottom: 5mm;
+                        cursor: move;
+                    }
+                    #ruler {
+                        position: relative;
+                        width: 21cm;
+                        height: 20px;
+                        background: #272636;
+                        margin: 0 auto;
+                        display: flex;
+                        align-items: center;
+                        user-select: none;
+                    }
+                    .tick {
+                        position: absolute;
+                        height: 100%;
+                        color: #9a9a9a;
+                        font-size: 10px;
+                        line-height: 20px;
+                    }
+                    .draggable-marker {
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        border-left: 8px solid transparent;
+                        border-right: 8px solid transparent;
+                        border-top: 12px solid #ff0000; /* Triangle color */
+                        cursor: ew-resize;
+                        transform: translateX(-50%); /* Center align the triangle */
+                        z-index: 30; /* Higher z-index to ensure it's above other elements */
+                    }
+                    #left-marker {
+                        left: 10mm; /* Default padding for left */
+                    }
+                    #right-marker {
+                        left: calc(210mm - 10mm); /* Default position for right marker */
+                    }
+                    .measure-line {
+                        position: absolute;
+                        width: 0.2px;
+                        min-height: 100vh;
+                        background-color: #ff0000;
+                        display: none;
+                        top: 0;
+                        left: 10mm;
+                        z-index: 20;
+                    }
+                    .back-button {
+                        width: 45px;
+                        height: 45px;
+                        border-radius: 50%;
+                        border: none;
+                        background-color: #2C2C2C;
+                        color: white;
+                        cursor: pointer;
+                        position: fixed;
+                        top: 10px;
+                        left: 20px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 1000;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                        transition: background-color 0.3s;
+                    }
+                    .back-button i {
+                        font-size: 20px;
+                    }
+                    .back-button:hover {
+                        background-color: #3B1F4C;
+                    }
+                    .button-container {
+                        margin-top: 20px; /* Adjust as needed */
+                    }
+                    /* GPT button & form */
+                    .work-experience-entry {
+                        margin-top: 20px;
+                    }
+                    ul:hover li {
+                        background-color: #fef0ff;
+                    }
+                    .gpt-generate-form {
+                        width: 500px;
+                        height: auto;
+                        border-radius: 10px;
+                        background-color: #fff;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        font-family: Calibri, sans-serif;
+                        display: flex;
+                        position: fixed; /* Fixed ensures positioning relative to the viewport */
+                        top: 50%; /* Center vertically in the viewport */
+                        left: 50%; /* Center horizontally in the viewport */
+                        transform: translate(-50%, -50%); /* Adjust for element's own size */
+                        cursor: grab; /* Dragging cursor */
+                        z-index: 1000; /* Ensure it's above other elements */
+                    }
+                    .gpt-generate-form.dragging {
+                        cursor: grabbing;
+                        transform: none;
+                        position: fixed; /* Fixed ensures positioning relative to the viewport */
+                        top: 50%; /* Center vertically in the viewport */
+                        left: 50%; /* Center horizontally in the viewport */
+                        transform: translate(-50%, -50%); /* Adjust for element's own size */
+                        z-index: 1000; /* Ensure it's above other elements */
+                    }
+                    .gpt-generate-btn {
+                        position: absolute;
+                        top: 50%; /* Center vertically relative to UL */
+                        left: 50%; /* Center horizontally relative to UL */
+                        transform: translate(-50%, -50%); /* Adjusts position to align with the center */
+                        z-index: 10; /* Ensures button is on top */
+                        display: none;
+                        align-items: center;
+                        padding: 5px 10px;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: #ffffff;
+                        cursor: pointer;
+                        background: linear-gradient(45deg, #ff0077, #9b00e5);
+                        transition: transform 0.2s ease-in-out;
+                        outline: none;
+                    }
+                    ul:hover .gpt-generate-btn {
+                        display: inline-block;
+                    }
+                    .generate-btn-container {
+                        display: flex;
+                        justify-content: flex-end; /* Align button to the right */
+                        margin-top: 10px; /* Optional: space above the button */
+                    }
+                    .generate-btn {
+                        display: flex;
+                        align-items: center;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 8px; /* Rounded corners */
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #ffffff;
+                        cursor: pointer;
+                        background: linear-gradient(45deg, #ff0077, #9b00e5); /* Gradient background */
+                        transition: transform 0.2s ease-in-out;
+                        outline: none;
+                    }
+                    .generate-btn i {
+                        margin-right: 8px; /* Space between icon and text */
+                        font-size: 18px;
+                    }
+                    .generate-btn:hover {
+                        transform: scale(1.05); /* Slight zoom effect on hover */
+                    }
+                    .generate-btn:active {
+                        transform: scale(0.98); /* Slight press effect on click */
+                    }
+                    .form-group {
+                        margin-bottom: 20px;
+                        padding: 0 20px;
+                    }
+                    .form-group label {
+                        display: block;
+                        font-weight: 500;
+                        font-size: 14px;
+                        margin-bottom: 8px;
+                        color: #333;
+                    }
+                    .form-field {
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 14px;
+                        transition: border-color 0.3s;
+                    }
+                    .form-field:focus {
+                        border-color: #DD00AC;
+                        outline: none;
+                    }
+                    /* Close button style */
+                    .form-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between; /* Aligns the close button to the top-right */
+                        margin-bottom: 20px; /* Adds some space below the header */
+                        cursor: default;
+                        padding: 20px;
+                    }
+                    .close-btn {
+                        background-color: transparent;
+                        border: none;
+                        font-size: 20px;
+                        cursor: pointer;
+                        color: #888;
+                        transition: color 0.3s;
+                        position: absolute;
+                        top: 20px;
+                        right: 20px; /* Adjusts to the right within the form */
+                    }
+                    .close-btn:hover {
+                        color: #333;
+                    }
+                    textarea.form-field {
+                        resize: none;
+                    }
+                    .gpt-suggestions {
+                        border-top: 1px solid #ddd;
+                        background-color: #DEDEDE;
+                        padding: 20px;
+                        border-radius: 0 0 10px 10px;
+                    }
+                    .bullet-point-option {
+                        display: flex;
+                        align-items: center;
+                        padding: 10px;
+                        margin-bottom: 8px;
+                        border-radius: 5px;
+                        cursor: pointer; /* Makes the row clickable */
+                        transition: background-color 0.2s;
+                        background-color: #f9f9f9;
+                    }
+                    .bullet-point-option:hover {
+                        background-color: #f0f0f0; /* Highlight effect on hover */
+                    }
+                    .bullet-checkbox {
+                        margin-right: 10px; /* Space between checkbox and text */
+                        cursor: pointer;
+                        transform: scale(1.2); /* Slightly larger checkbox */
+                    }
+                    .bullet-point-option span {
+                        color: #333;
+                        font-size: 14px;
+                    }
+                    .bullet-point-option input[type="checkbox"]:checked + span {
+                        font-weight: bold; /* Optional: Make checked items bold */
+                        color: #333;
+                    }
+                    /* Save as pdf */
+                    .pdf-export .placeholder, 
+                    .pdf-export .gpt-generate-btn, 
+                    .pdf-export .remove-button, 
+                    .pdf-export .drag-handle, 
+                    .pdf-export .drag-handle1, 
+                    .pdf-export .add-section-container,
+                    .pdf-export button {
+                        display: none !important; /* Hide placeholders and buttons */
+                    }
+                    .pdf-export ul {
+                        list-style-type: disc !important; 
+                    } 
+                    .custom-download-btn {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px; /* Spacing between icon and text */
+                        background-color: #1E1E29; /* Background color similar to your layout */
+                        color: #FFFFFF; /* Text color */
+                        font-size: 16px;
+                        font-weight: 500;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        border: none;
+                        cursor: pointer;
+                        transition: background-color 0.3s ease;
+                    }
+                    .custom-download-btn i {
+                        font-size: 18px; /* Adjust icon size */
+                        color: #EADDFF; /* Icon color similar to the one in your image */
+                    }
+                    .custom-download-btn:hover {
+                        background-color: #3B1F4C; /* Background color on hover */
+                        color: #FFFFFF; /* Text color on hover */
+                    }
+                    /* add section button */
+                    /* Modal Styling */
+                    .modal {
+                        display: none;
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: white;
+                        padding: 20px;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                        z-index: 1000;
+                        text-align: center;
+                        width: 300px;
+                    }
+                    .modal-header {
+                        font-size: 20px;
+                        color: #4A47A3;
+                        margin-bottom: 15px;
+                    }
+                    /* Buttons inside the modal */
+                    .modal-button {
+                        background-color: #6A61C1;
+                        color: white;
+                        border: none;
+                        padding: 10px 15px;
+                        margin: 5px;
+                        font-size: 14px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    }
+                    .modal-button:hover {
+                        background-color: #4A47A3;
+                        transform: scale(1.05);
+                    }
+                    .modal-close-button {
+                        background-color: #E5E5E5;
+                        color: #333;
+                        border: none;
+                        padding: 10px 15px;
+                        font-size: 14px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        margin-top: 10px;
+                        transition: all 0.3s ease;
+                    }
+                    .modal-close-button:hover {
+                        background-color: #C5C5C5;
+                    }
+                    /* Add Section Button Styling */
+                    .add-section-container {
+                        display: none;
+                        text-align: center;
+                        margin: 20px 0;
+                    }
+                    .add-section-button {
+                        background-color: #6A61C1;
+                        color: white;
+                        border: none;
+                        padding: 12px 20px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    }
+                    .add-section-button:hover {
+                        background-color: #4A47A3;
+                        transform: scale(1.1);
+                    }
+                    .modal-button-container {
+                        width: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    #draggable-container {
+                        z-index: 2;
+                    }
+                </style>
+                <!-- customize -->
+                <style>
+                    .bold {
+                        font-weight: bold;
+                    }
+                    .italic {
+                        font-style: italic;
+                    }
                 </style>
             </head>
             <body>
-                <page>
+                <div class="container" id="resume-container">
                     ${content}
-                </page>
+                </div>
             </body>
             </html>
         `;
