@@ -13,6 +13,7 @@ const { handleWebhook } = require('./webhooks');
 const puppeteer = require('puppeteer');
 require('./auth');
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
+
 const OpenAI = require('openai');
 const crypto = require('crypto'); // For generating OTP
 const otps = new Map(); // To store OTPs temporarily
@@ -49,8 +50,8 @@ function isLoggedIn(req, res, next) {
         res.redirect('/loginFirst');
     }
 }
-// Webhook endpoint must use raw body for Stripe signature verification
-app.post('/webhook', bodyParser.raw({ type: 'application/json' }), handleWebhook);
+// ✅ Webhook for Stripe Events
+app.post('/webhook', express.raw({ type: 'application/json' }), handleWebhook);
 // Increase payload size limit
 app.use(bodyParser.json({ limit: '10mb' })); // You can increase the limit as needed
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true })); // If you use URL-encoded data
@@ -123,49 +124,78 @@ const sendEmail = async (to, subject, text) => {
     }
 };
 
+// ✅ Stripe Checkout Session Route
+app.post('/create-checkout-session', (req, res) => {
+    console.log('📌 [STEP 1] Received request to create checkout session');
 
-
-// Stripe payment route
-app.post('/create-checkout-session', async (req, res) => {
-    // Check if the user is authenticated
     if (!req.user || !req.user.id || !req.user.email) {
-        console.error('User not authenticated or missing data.');
-        
-        // Send an alert message to the frontend
-        return res.status(401).json({ 
-            error: { message: 'Please log in to continue.' },
-            redirect: '/login'
-        });
+        console.error('❌ User not authenticated.');
+        return res.status(401).json({ error: { message: 'Please log in to continue.' }, redirect: '/login' });
     }
 
     const { priceId } = req.body;
-
     if (!priceId) {
         return res.status(400).json({ error: { message: 'Missing priceId in request.' } });
     }
 
-    try {
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            mode: 'subscription',
-            customer_email: req.user.email,
-            metadata: { user_id: req.user.id }, // Pass user ID in metadata
-            line_items: [
-                {
-                    price: priceId,
-                    quantity: 1,
-                },
-            ],
-            success_url: `${req.headers.origin}/dashboard?subs=success`,
-            cancel_url: `${req.headers.origin}/?payment_status=cancelled`,
-        });
+    console.log(`📌 [STEP 2] Fetching Stripe customer ID for User ID: ${req.user.id}`);
 
-        res.json({ url: session.url });
-    } catch (error) {
-        console.error('Stripe Error:', error.message);
-        res.status(500).json({ error: { message: error.message } });
-    }
+    db.query('SELECT stripe_customer_id FROM users WHERE id = ?', [req.user.id], function (err, result) {
+        if (err) {
+            console.error('❌ Database query error:', err);
+            return res.status(500).json({ error: { message: 'Database query failed' } });
+        }
+
+        let stripeCustomerId = result.length > 0 ? result[0].stripe_customer_id : null;
+        console.log(`📌 [STEP 3] Stripe Customer ID: ${stripeCustomerId || 'Not Found'}`);
+
+        function createCheckoutSession(customerId) {
+            console.log('📌 [STEP 4] Creating Stripe Checkout Session...');
+            stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                mode: 'subscription',
+                customer: customerId,
+                metadata: { user_id: req.user.id },
+                line_items: [{ price: priceId, quantity: 1 }],
+                success_url: `${req.headers.origin}/dashboard?subs=success`,
+                cancel_url: `${req.headers.origin}/?payment_status=cancelled`,
+            }, function (err, session) {
+                if (err) {
+                    console.error('❌ Stripe checkout session creation failed:', err);
+                    return res.status(500).json({ error: { message: 'Checkout session creation failed' } });
+                }
+                console.log('✅ [STEP 5] Checkout Session Created! Redirecting user...');
+                res.json({ url: session.url });
+            });
+        }
+
+        if (!stripeCustomerId) {
+            console.log('📌 [STEP 6] No Stripe Customer ID found, creating one...');
+            stripe.customers.create({ email: req.user.email, metadata: { user_id: req.user.id } }, function (err, customer) {
+                if (err) {
+                    console.error('❌ Stripe customer creation failed:', err);
+                    return res.status(500).json({ error: { message: 'Stripe customer creation failed' } });
+                }
+
+                stripeCustomerId = customer.id;
+                console.log(`✅ [STEP 7] Stripe Customer Created: ${stripeCustomerId}`);
+
+                db.query('UPDATE users SET stripe_customer_id = ? WHERE id = ?', [stripeCustomerId, req.user.id], function (err) {
+                    if (err) {
+                        console.error('❌ Database update error:', err);
+                        return res.status(500).json({ error: { message: 'Database update failed' } });
+                    }
+                    console.log('✅ [STEP 8] User updated with Stripe Customer ID. Proceeding to checkout session...');
+                    createCheckoutSession(stripeCustomerId);
+                });
+            });
+        } else {
+            createCheckoutSession(stripeCustomerId);
+        }
+    });
 });
+
+
 app.get('/check-subscription-status', async (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(401).json({ error: 'User not authenticated.' });
@@ -827,19 +857,35 @@ app.post('/verify-otp', (req, res) => {
 
 
 
-
 app.post('/generate-gpt-suggestions', (req, res) => {
     const { prompt } = req.body;
     const userId = req.user.id;
+
     if (!userId) {
         return res.status(400).json({ error: 'User ID is required.' });
     }
 
-    // Check the user's available prompts
-    const queryCheck = 'SELECT * FROM users WHERE id = ?';
-    db.query(queryCheck, [userId], (err, results) => {
+    console.log(`📌 [CHECK] User ID: ${userId} is requesting GPT suggestions`);
+
+    // ✅ Check if this user's subscription is expired & update status if needed
+    const queryCheck = `
+        UPDATE users 
+        SET subscription_status = 'past_due' 
+        WHERE id = ? AND subscription_status = 'active' AND subscription_end_date < NOW()
+    `;
+    db.query(queryCheck, [userId], (err, result) => {
         if (err) {
-            console.error('Error checking user:', err);
+            console.error('❌ Database error while updating expired subscriptions:', err);
+        } else if (result.affectedRows > 0) {
+            console.log(`🔄 [UPDATED] User ${userId} subscription changed to 'past_due'`);
+        }
+    });
+
+    // ✅ Get user details after the potential update
+    const queryUser = 'SELECT subscription_status, subscription_end_date, defaultgptprompt FROM users WHERE id = ?';
+    db.query(queryUser, [userId], (err, results) => {
+        if (err) {
+            console.error('❌ Database error:', err);
             return res.status(500).json({ error: 'Database error' });
         }
 
@@ -848,40 +894,67 @@ app.post('/generate-gpt-suggestions', (req, res) => {
         }
 
         const user = results[0];
+        const { subscription_status, subscription_end_date, defaultgptprompt } = user;
+        const currentDate = new Date();
+        const endDate = new Date(subscription_end_date);
 
-        if (user.defaultgptprompt <= 0) {
+        console.log(`📌 [CHECK] User: ${userId}, Status: ${subscription_status}, End Date: ${subscription_end_date}, Prompts: ${defaultgptprompt}`);
+
+        // ❌ Block users with expired subscriptions
+        if (subscription_status === 'past_due' || (subscription_status === 'active' && currentDate > endDate)) {
+            console.log(`❌ [BLOCKED] Subscription expired for User ${userId}`);
             return res.status(403).json({
-                error: 'No prompts remaining. Please upgrade your plan to continue.',
+                error: 'Your subscription has expired. Please renew to continue using GPT.',
+                redirect: '/subscribe'
             });
         }
 
-        // Decrement the `defaultgptprompt` count
-        const queryUpdate = 'UPDATE users SET defaultgptprompt = defaultgptprompt - 1 WHERE id = ?';
-        db.query(queryUpdate, [userId], (updateErr) => {
-            if (updateErr) {
-                console.error('Error updating user prompts:', updateErr);
-                return res.status(500).json({ error: 'Database error' });
-            }
+        // ❌ Block free trial users with no prompts left
+        if (subscription_status === 'freetrial' && defaultgptprompt <= 0) {
+            console.log(`❌ [BLOCKED] No prompts remaining for Free Trial User ${userId}`);
+            return res.status(403).json({
+                error: 'No free trial prompts left. Please subscribe to continue.',
+                redirect: '/subscribe'
+            });
+        }
 
-            // Call OpenAI API
-            openai.chat.completions
-                .create({
-                    messages: [{ role: 'user', content: prompt }],
-                    model: 'gpt-4',
-                    max_tokens: 300,
-                    temperature: 0.7,
-                    n: 3,
-                })
-                .then((completion) => {
-                    res.json(completion.choices);
-                })
-                .catch((error) => {
-                    console.error('Error generating GPT-4 suggestions:', error);
-                    res.status(500).send('Error generating GPT-4 suggestions');
-                });
-        });
+        // ✅ Deduct 1 prompt for free trial users
+        if (subscription_status === 'freetrial') {
+            console.log(`📌 [UPDATE] Deducting 1 prompt for Free Trial User ${userId}`);
+            db.query('UPDATE users SET defaultgptprompt = defaultgptprompt - 1 WHERE id = ?', [userId], (updateErr) => {
+                if (updateErr) {
+                    console.error('❌ Database error while updating prompts:', updateErr);
+                    return res.status(500).json({ error: 'Database error' });
+                }
+                generateResponse(prompt, res);
+            });
+        } else {
+            // ✅ Active users have unlimited prompts
+            console.log(`✅ [ALLOWED] User ${userId} has unlimited prompts.`);
+            generateResponse(prompt, res);
+        }
     });
 });
+
+// ✅ Function to generate GPT response
+function generateResponse(prompt, res) {
+    openai.chat.completions
+        .create({
+            messages: [{ role: 'user', content: prompt }],
+            model: 'gpt-4o',
+            max_tokens: 300,
+            temperature: 0.7,
+            n: 3,
+        })
+        .then((completion) => {
+            res.json(completion.choices);
+        })
+        .catch((error) => {
+            console.error('❌ Error generating GPT-4 suggestions:', error);
+            res.status(500).send('Error generating GPT-4 suggestions');
+        });
+}
+
 
 app.get('/dashboard', isLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));

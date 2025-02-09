@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
-const mysql = require('mysql2/promise'); // Use promise-based MySQL
+const mysql = require('mysql2/promise');
 
-// Database connection
+// ✅ Database connection
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -10,59 +10,83 @@ const db = mysql.createPool({
 });
 
 async function handleWebhook(req, res) {
+    console.log('📌 [WEBHOOK] Received a webhook request...');
     const sig = req.headers['stripe-signature'];
     let event;
 
     try {
-        // Construct event
-        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_API);
-        console.log('Webhook event received:', event.type);
+        const rawBody = req.body.toString(); // Convert Buffer to string
+        event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+
+        console.log('✅ [WEBHOOK] Stripe Event Type:', event.type);
     } catch (err) {
-        console.error('Webhook signature verification failed:', err.message);
+        console.error('❌ [WEBHOOK] Signature verification failed:', err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // Only handle checkout.session.completed
     if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
+        console.log('📌 [WEBHOOK] Handling checkout.session.completed event');
 
-        console.log('Session Data:', JSON.stringify(session, null, 2));
+        const session = event.data.object;
+        console.log('🎯 [WEBHOOK] Session Data:', JSON.stringify(session, null, 2));
 
         const customerId = session.customer;
-        const subscriptionId = session.subscription;
-        const userId = session.metadata.user_id; // user_id from metadata
+        const subscriptionId = session.subscription || null;
+        const userId = session.metadata ? session.metadata.user_id : null;
 
-        if (!customerId || !subscriptionId || !userId) {
-            console.error('Missing required details:', { customerId, subscriptionId, userId });
+        console.log(`📌 [WEBHOOK] Extracted user_id: ${userId}, stripe_customer_id: ${customerId}`);
+
+        if (!customerId || !userId) {
+            console.error('❌ [WEBHOOK] Missing customerId or userId:', { customerId, userId });
             return res.status(400).send('Missing required details.');
         }
 
         try {
-            // Retrieve subscription details
-            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-            const endDate = new Date(subscription.current_period_end * 1000);
+            let endDate;
+            if (subscriptionId) {
+                console.log(`📌 [WEBHOOK] Retrieving subscription details for ${subscriptionId}`);
+                const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+                endDate = new Date(subscription.current_period_end * 1000);
+            } else {
+                console.log('📌 [WEBHOOK] No subscription ID found. Defaulting to +30 days.');
+                endDate = new Date();
+                endDate.setDate(endDate.getDate() + 30);
+            }
 
-            console.log('Subscription Retrieved:', { endDate, subscriptionId, customerId });
+            const formattedEndDate = endDate.toISOString().slice(0, 19).replace("T", " ");
+            console.log(`📌 [WEBHOOK] Calculated Subscription End Date: ${formattedEndDate}`);
 
-            // Update database
+            // ✅ Debug: Check if user exists before updating
+            const [existingUser] = await db.query(`SELECT id FROM users WHERE id = ?`, [userId]);
+            if (existingUser.length === 0) {
+                console.error(`❌ [WEBHOOK] User ID ${userId} not found in database.`);
+                return res.status(400).send('User not found.');
+            }
+
             const updateQuery = `
                 UPDATE users
-                SET stripe_customer_id = ?, subscription_status = 'active', subscription_end_date = ?
+                SET stripe_customer_id = ?, subscription_status = 'active', 
+                    subscription_end_date = ?
                 WHERE id = ?
             `;
 
-            const [result] = await db.query(updateQuery, [customerId, endDate, userId]);
-            if (result.affectedRows > 0) {
-                console.log('Subscription updated successfully for User ID:', userId);
+            console.log(`🔄 [WEBHOOK] Updating DB for user_id: ${userId} with stripe_customer_id: ${customerId}`);
+
+            // ✅ Fix TypeError issue by correctly handling MySQL response
+            const result = await db.query(updateQuery, [customerId, formattedEndDate, userId]);
+            console.log(`📌 [WEBHOOK] Raw MySQL Result:`, result);
+
+            if (result[0].affectedRows > 0) {
+                console.log(`✅ [WEBHOOK] Subscription updated successfully for User ID: ${userId}`);
             } else {
-                console.error('No rows updated. Invalid User ID:', userId);
+                console.error(`❌ [WEBHOOK] No rows updated. Possibly invalid User ID: ${userId}`);
             }
 
         } catch (err) {
-            console.error('Error updating database or retrieving subscription:', err.message);
+            console.error('❌ [WEBHOOK] Error updating database:', err.message);
         }
     } else {
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`ℹ️ [WEBHOOK] Unhandled event type: ${event.type}`);
     }
 
     res.status(200).json({ received: true });

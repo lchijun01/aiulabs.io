@@ -44,8 +44,31 @@
             line-height: 1.5; /* Apply line height only to editable content */
         }
         ul {
-            padding-left: 20px;
+            padding-left: 0 !important; /* Ensures space for bullets */
+            margin-left: 0 !important;
+            list-style-type: disc !important;
+            list-style-position: outside !important;
             position: relative;
+        }
+        li {
+            text-indent: 0 !important;
+            margin-left: 0 !important;
+            display: flex !important;
+            align-items: flex-start !important;
+        }
+        li::marker {
+            font-size: 1em;
+            color: black;
+            width: 20px; /* Doesn't work on ::marker, workaround below */
+        }
+        /* ✅ Workaround: Use a pseudo-element for better control */
+        li::before {
+            content: "•"; /* Bullet */
+            color: black;
+            font-size: 1em;
+            display: inline-block;
+            width: 30px; /* Ensures fixed width */
+            text-align: left; /* Aligns left */
         }
         .container {
             width: 210mm; /* A4 width */
@@ -102,7 +125,7 @@
             color: #666;
         }
         .content {
-            font-size: 11px;
+            font-size: 12px;
         }
         .placeholder {
             color: #cecece !important; /* Placeholder text color */
@@ -130,8 +153,8 @@
             margin-bottom: 15px;
         }
         .image-box {
-            width: 90px;
-            height: 116px;
+            width: 77.6px;
+            height: 100px;
             border: 1px solid #ccc;
             display: flex;
             align-items: center;
@@ -254,13 +277,13 @@
         .pagination-line {
             width: 100%;
             border-bottom: 1px dashed #ddd;
-            border-top: 1px dashed #ddd;
             text-align: center;
             font-size: 12px;
             color: #666;
             position: absolute;
             left: 0;
             text-align: left;
+            height: 0;
         }
         .pagination-line span {
             position: relative;
@@ -415,7 +438,6 @@
             border: none;
             cursor: pointer;
             text-align: center;
-            display: none;
             position: relative;
             color: #9b00e5;
             background: 0;
@@ -445,7 +467,6 @@
             border: none;
             cursor: pointer;
             text-align: center;
-            display: none;
             position: relative;
             color: #ff0077;
             background: 0;
@@ -471,9 +492,6 @@
             font-size: 12px;
             opacity: 1;
             z-index: 10;
-        }
-        .section-title .remove-button, .section-title .add-button {
-            display: none; /* Hide the remove button by default */
         }
         .section-header:hover .remove-button, .section-header:hover .add-button {
             display: inline-block; /* Display the remove button when hovering over .section-title p */
@@ -936,8 +954,34 @@
             display: none !important; /* Hide placeholders and buttons */
         }
         .pdf-export ul {
-            list-style-type: disc !important; 
-        } 
+            padding-left: 0 !important; /* Ensures space for bullets */
+            margin-left: 0 !important;
+            list-style-type: disc !important;
+            list-style-position: outside !important;
+        }
+
+        .pdf-export li {
+            text-indent: 0 !important;
+            margin-left: 0 !important;
+            display: flex !important;
+            align-items: flex-start !important;
+        }
+
+        .pdf-export li::marker {
+            font-size: 1em;
+            color: black;
+            width: 20px; /* Doesn't work on ::marker, workaround below */
+        }
+
+        /* ✅ Workaround: Use a pseudo-element for better control */
+        .pdf-export li::before {
+            content: "•"; /* Bullet */
+            color: black;
+            font-size: 1em;
+            display: inline-block;
+            width: 30px; /* Ensures fixed width */
+            text-align: left; /* Aligns left */
+        }
         .custom-download-btn {
             display: flex;
             align-items: center;
@@ -1242,6 +1286,28 @@
             background-color: #333144;
             color: white;
         }
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 5px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .zoom-controls button {
+            color: white;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .mainnn, #ruler {
+            transition: transform 0.1s ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -1329,7 +1395,45 @@
                 </form>
             </div>
             <div id="modal-overlay" onclick="closePaddingModal()"></div>
-            
+            <div class="zoom-controls">
+                <button onclick="zoomIn()">🔍 +</button>
+                <button onclick="zoomOut()">🔍 -</button>
+                <button onclick="resetZoom()">🔄 Reset</button>
+            </div>
+            <script>
+                let zoomLevel = 1;
+
+                function zoomIn() {
+                    zoomLevel += 0.1;
+                    applyZoom();
+                }
+
+                function zoomOut() {
+                    zoomLevel -= 0.1;
+                    if (zoomLevel < 0.5) zoomLevel = 0.5; // Prevent excessive zoom out
+                    applyZoom();
+                }
+
+                function resetZoom() {
+                    zoomLevel = 1;
+                    applyZoom();
+                }
+
+                function applyZoom() {
+                    const elements = [document.querySelector('.mainnn'), document.querySelector('#ruler')];
+
+                    elements.forEach(el => {
+                        if (el) {
+                            el.style.transform = `scale(${zoomLevel})`;
+                            el.style.transformOrigin = "center top";
+                        }
+                    });
+
+                    // Prevent horizontal scrolling
+                    document.body.style.overflowX = "hidden";
+                }
+
+            </script>
         </div>
         <div>
             <button id="download-pdf" class="custom-download-btn">
@@ -1346,7 +1450,7 @@
         </div>
     </div>
 </section>
-<div style="margin: 100px 0;">
+<div class="mainnn" style="margin: 100px 0;">
     <div class="container" id="resume-container">
     </div>
 </div>
@@ -1400,8 +1504,8 @@
                     <div class="drag-handle"></div>
                 </div>
                 <div class="content">
-                    <p id="editable-text" class="editable-text placeholder" data-placeholder="[A one-sentence pitch that summarizes your experience, skills, or achievements that make you stand out from others]. Aspire to seek available [position title] position within your organisation/at [company name]." contenteditable="true">
-                        [A one-sentence pitch that summarizes your experience, skills, or achievements that make you stand out from others]. Aspire to seek available [position title] position within your organisation/at [company name].
+                    <p id="editable-text" class="editable-text placeholder" data-placeholder="[A one-sentence pitch that summarizes your experience, skills, or achievements that make you stand out from others]. Aspire to seek available [position title] position within your organisation/at [company name]. Available to start working with a 3-month notice period." contenteditable="true">
+                        [A one-sentence pitch that summarizes your experience, skills, or achievements that make you stand out from others]. Aspire to seek available [position title] position within your organisation/at [company name]. Available to start working with a 3-month notice period.
                     </p>
                 </div>
             </div>
@@ -1677,7 +1781,6 @@
                 const line = document.createElement("div");
                 line.className = "pagination-line";
                 line.style.top = `${linePosition}px`;
-                line.innerHTML = `<span>Page ${i + 1}</span>`;
                 paginationContainer.appendChild(line);
             }
         }
@@ -2185,19 +2288,15 @@
         let role = form.querySelector('.role').value.trim();
         let experienceSummary = form.querySelector('.experience-summary').value.trim();
 
-        // Default role and experience summary
         const defaultRole = "Software Engineer";
         const defaultExperienceSummary = "Scripting with PowerShell";
 
-        // Validate role and experience summary
-        const roleRegex = /^[a-zA-Z\s]+$/; // Accepts alphabetic characters and spaces
+        const roleRegex = /^[a-zA-Z\s]+$/;
         if (!role || !roleRegex.test(role) || role.length < 3) {
-            alert('Invalid role detected. Using default role: "Software Engineer".');
             role = defaultRole;
         }
 
         if (!experienceSummary || experienceSummary.length < 10) {
-            alert('Invalid experience summary detected. Using default experience summary: "Scripting with PowerShell".');
             experienceSummary = defaultExperienceSummary;
         }
 
@@ -2209,19 +2308,18 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    prompt: `Generate three concise bullet points for the role "${role}" based on the following summary: "${experienceSummary}". Each bullet point should:
-            1. Be limited to 25–30 words.
-            2. Begin with a dash (-) instead of numbers.
-            3. Each bullet point is different and highlights a unique achievement, skill, or measurable contribution.
-            4. Be impactful, professional, and concise.
+                    prompt: `Generate exactly three impactful bullet points for a "${role}" based on this experience summary: "${experienceSummary}". Each bullet point should:
+                    - Be between 130 to 210 characters (strictly enforced).
+                    - Start with a dash (-) followed by a space.
+                    - Be unique, professional, and result-driven.
+                    - Avoid generic statements and instead highlight measurable impact.
 
-            Output format:
-            - Example bullet point 1 (25–30 words)
-            - Example bullet point 2 (25–30 words)
-            - Example bullet point 3 (25–30 words)`,
+                    Output format:
+                    - First bullet point (130-210 characters)
+                    - Second bullet point (130-210 characters)
+                    - Third bullet point (130-210 characters)`,
                 }),
             });
-
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -2232,38 +2330,57 @@
 
             const data = await response.json();
             if (data && Array.isArray(data)) {
-                // Clear previous suggestions
                 const suggestionsContainer = form.querySelector('.suggestion-options');
                 suggestionsContainer.innerHTML = '';
 
+                let validBullets = 0;
+
                 data.forEach((choice, index) => {
-                    const cleanedText = choice.message.content.trim().replace(/-/g, ''); // Remove all dashes
-                    const suggestionDiv = document.createElement('label');
-                    suggestionDiv.classList.add('bullet-point-option');
+                    let text = choice.message.content.trim();
+                    
+                    // ✅ Extracting exactly 3 sentences that meet char limit
+                    const sentences = text.split(/\n+/).filter(sentence => {
+                        return sentence.length >= 130 && sentence.length <= 210;
+                    }).slice(0, 3); 
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.classList.add('bullet-checkbox');
-                    checkbox.dataset.content = cleanedText;
-                    checkbox.dataset.index = index;
-                    checkbox.dataset.id = id;
+                    sentences.forEach(sentence => {
+                        if (validBullets >= 3) return; // Stop after 3 bullet points
+                        
+                        const cleanedText = sentence.replace(/^- /, '').trim(); // Remove leading dash
+                        const suggestionDiv = document.createElement('label');
+                        suggestionDiv.classList.add('bullet-point-option');
 
-                    const labelText = document.createElement('span');
-                    labelText.textContent = cleanedText;
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.classList.add('bullet-checkbox');
+                        checkbox.dataset.content = cleanedText;
+                        checkbox.dataset.index = index;
+                        checkbox.dataset.id = id;
 
-                    suggestionDiv.appendChild(checkbox);
-                    suggestionDiv.appendChild(labelText);
-                    suggestionsContainer.appendChild(suggestionDiv);
+                        const labelText = document.createElement('span');
+                        labelText.textContent = cleanedText;
 
-                    checkbox.addEventListener('change', function () {
-                        if (checkbox.checked) {
-                            checkbox.dataset.timestamp = Date.now(); // Set timestamp when checked
-                        } else {
-                            delete checkbox.dataset.timestamp; // Remove timestamp if unchecked
-                        }
-                        updateBulletPoints(id);
+                        suggestionDiv.appendChild(checkbox);
+                        suggestionDiv.appendChild(labelText);
+                        suggestionsContainer.appendChild(suggestionDiv);
+
+                        checkbox.addEventListener('change', function () {
+                            if (checkbox.checked) {
+                                checkbox.dataset.timestamp = Date.now();
+                            } else {
+                                delete checkbox.dataset.timestamp;
+                            }
+                            updateBulletPoints(id);
+                        });
+
+                        validBullets++;
                     });
                 });
+
+                if (validBullets === 0) {
+                    placeholderMessage.textContent = "No valid suggestions found. Try again.";
+                }
+
             } else {
                 placeholderMessage.textContent = "No suggestions found. Please try again.";
             }
@@ -2273,6 +2390,7 @@
             placeholderMessage.textContent = 'Error occurred while generating suggestions.';
         }
     }
+
 
     // work experience form - Update bullet points to maintain order based on the time they were checked
     function updateBulletPoints(id) {
@@ -2323,24 +2441,16 @@
         let tools = form.querySelector('.tools').value.trim();
         let experience = form.querySelector('.experience-summary').value.trim();
 
-        // Default role and experience summary
+        // Default values
         const defaultRole = "Designer";
         const defaultExperience = "Created user interfaces for a mobile banking app";
         const defaultTools = "Zeplin and Sketch";
 
-        // Validate role and experience summary
-        const roleRegex = /^[a-zA-Z\s]+$/; // Accepts alphabetic characters and spaces
-        if (!role || !roleRegex.test(role) || role.length < 3) {
-            role = defaultRole;
-        }
-
-        if (!experience || experience.length < 10) {
-            experience = defaultExperience;
-        }
-
-        if (!tools || tools.length < 10) {
-            tools = defaultTools;
-        }
+        // Validate inputs
+        const roleRegex = /^[a-zA-Z\s]+$/;
+        if (!role || !roleRegex.test(role) || role.length < 3) role = defaultRole;
+        if (!experience || experience.length < 10) experience = defaultExperience;
+        if (!tools || tools.length < 10) tools = defaultTools;
 
         const placeholderMessage = form.querySelector('#placeholder-messageA');
         placeholderMessage.textContent = 'Generating suggestions... Please wait.';
@@ -2350,23 +2460,20 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    prompt: `Write three detailed, impactful, and distinct bullet points summarizing the following project experience. Ensure:
-            1. Each bullet point highlights a unique aspect of the project, including specific contributions, measurable outcomes, and collaborative efforts.
-            2. Each bullet point is limited to 25–30 words.
-            3. Bullet points begin with a dash (-) instead of numbers.
-            4. All three points are professional, concise, and non-redundant.
+                    prompt: `Generate exactly three professional bullet points describing this project experience. Each bullet point must:
+                    - Be between 130 to 210 characters.
+                    - Start with a dash (-) and space.
+                    - Be specific, impactful, and unique (avoid redundancy).
+                    - Highlight key contributions, measurable impact, and collaboration.
 
-            Input:
-            Role: ${role}
-            Project Tools: ${tools}
-            Project Experience: ${experience}
+                    Role: ${role}
+                    Tools Used: ${tools}
+                    Experience Summary: ${experience}
 
-            Output format:
-            - Example bullet point 1 (25–30 words)
-            - Example bullet point 2 (25–30 words)
-            - Example bullet point 3 (25–30 words)
-
-            Generate unique, actionable points that align with the above format.`,
+                    Output format:
+                    - First bullet point (130-210 chars)
+                    - Second bullet point (130-210 chars)
+                    - Third bullet point (130-210 chars)`,
                 }),
             });
 
@@ -2379,44 +2486,62 @@
 
             const data = await response.json();
             if (data && Array.isArray(data)) {
-                // Clear previous suggestions
                 const suggestionsContainer = form.querySelector('.suggestion-options');
                 suggestionsContainer.innerHTML = '';
 
+                let validBullets = 0;
                 data.forEach((choice, index) => {
-                    const cleanedText = choice.message.content.trim().replace(/-/g, ''); // Remove all dashes
-                    const suggestionDiv = document.createElement('label');
-                    suggestionDiv.classList.add('bullet-point-option');
+                    let text = choice.message.content.trim();
+                    
+                    // ✅ Extract 3 valid sentences that fit the length requirement
+                    const sentences = text.split(/\n+/).filter(sentence => {
+                        return sentence.length >= 130 && sentence.length <= 210;
+                    }).slice(0, 3); // Take only 3 valid points
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.classList.add('bullet-checkbox');
-                    checkbox.dataset.content = cleanedText;
-                    checkbox.dataset.index = index;
-                    checkbox.dataset.id = id;
+                    sentences.forEach(sentence => {
+                        if (validBullets >= 3) return; // Stop at 3 bullet points
+                        
+                        const cleanedText = sentence.replace(/^- /, '').trim(); // Remove leading dash
+                        const suggestionDiv = document.createElement('label');
+                        suggestionDiv.classList.add('bullet-point-option');
 
-                    const labelText = document.createElement('span');
-                    labelText.textContent = cleanedText;
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.classList.add('bullet-checkbox');
+                        checkbox.dataset.content = cleanedText;
+                        checkbox.dataset.index = index;
+                        checkbox.dataset.id = id;
 
-                    suggestionDiv.appendChild(checkbox);
-                    suggestionDiv.appendChild(labelText);
-                    suggestionsContainer.appendChild(suggestionDiv);
+                        const labelText = document.createElement('span');
+                        labelText.textContent = cleanedText;
 
-                    checkbox.addEventListener('change', function () {
-                        if (checkbox.checked) {
-                            checkbox.dataset.timestamp = Date.now(); // Set timestamp when checked
-                        } else {
-                            delete checkbox.dataset.timestamp; // Remove timestamp if unchecked
-                        }
-                        updateBulletPointsA(id, projectId);
+                        suggestionDiv.appendChild(checkbox);
+                        suggestionDiv.appendChild(labelText);
+                        suggestionsContainer.appendChild(suggestionDiv);
+
+                        checkbox.addEventListener('change', function () {
+                            if (checkbox.checked) {
+                                checkbox.dataset.timestamp = Date.now();
+                            } else {
+                                delete checkbox.dataset.timestamp;
+                            }
+                            updateBulletPointsA(id, projectId);
+                        });
+
+                        validBullets++;
                     });
                 });
+
+                if (validBullets === 0) {
+                    placeholderMessage.textContent = "No valid suggestions found. Try again.";
+                }
+
             } else {
                 placeholderMessage.textContent = "No suggestions found. Please try again.";
             }
 
         } catch (error) {
-            console.error('Error generating experience descriptions:', error);
+            console.error('Error generating project experience descriptions:', error);
             placeholderMessage.textContent = 'Error occurred while generating suggestions.';
         }
     }
@@ -2451,24 +2576,26 @@
         const monthPicker = document.getElementById(
             type === 'start' ? `start-month-picker-${counter}` : `end-month-picker-${counter}`
         );
-        const otherPicker = document.getElementById(
-            type === 'start' ? `end-month-picker-${counter}` : `start-month-picker-${counter}`
-        );
 
-        otherPicker.style.display = 'none'; // Close the other picker if open
+        if (!monthPicker) {
+            console.error(`❌ Month picker not found: ${type}-month-picker-${counter}`);
+            return;
+        }
 
         if (monthPicker.innerHTML.trim() === '') {
             generateMonthPicker(monthPicker, type, counter);
         }
+
         monthPicker.style.display = 'block';
     }
+
 
     function generateMonthPicker(container, type, counter) {
         container.innerHTML = `
             <div class="year">
-                <span onclick="changeYear(-1, '${type}', ${counter})"><</span>
+                <span onclick="changeYearMonthPicker(-1, '${type}', ${counter})"><</span>
                 <span id="${type}-year-display-${counter}">${currentYear}</span>
-                <span onclick="changeYear(1, '${type}', ${counter})">></span>
+                <span onclick="changeYearMonthPicker(1, '${type}', ${counter})">></span>
             </div>
             <div class="months">
                 ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -2484,8 +2611,16 @@
         `;
     }
 
-    function changeYear(offset, type, counter) {
+    function changeYearMonthPicker(offset, type, counter) {
+        console.log(`📌 Changing year with offset ${offset}, type ${type}, counter ${counter}`);
+
         const yearDisplay = document.getElementById(`${type}-year-display-${counter}`);
+
+        if (!yearDisplay) {
+            console.error(`❌ Cannot find year display: ${type}-year-display-${counter}`);
+            return;
+        }
+
         currentYear = parseInt(yearDisplay.textContent) + offset;
         yearDisplay.textContent = currentYear;
     }
@@ -2949,31 +3084,8 @@
 
     const PAGE_HEIGHT = 297; // A4 height in mm
     const TOP_PADDING = 10; // Top padding in mm
-    const AVAILABLE_HEIGHT = PAGE_HEIGHT - TOP_PADDING;
-
-    let cumulativeHeight = 0;
-
-    // Scan elements inside draggable-container
-    Array.from(draggableContainer.children).forEach((child) => {
-        // Measure the element's height
-        const childHeight = child.offsetHeight * 0.264583; // Convert px to mm (1px = 0.264583mm)
-
-        // Add the child's height to the cumulative height
-        cumulativeHeight += childHeight;
-
-        // Check if the element exceeds the available height
-        if (cumulativeHeight > AVAILABLE_HEIGHT) {
-            // Add padding to the overflowing element
-            child.style.paddingTop = "20mm";
-
-            // Log the adjusted element
-            console.log("Adding padding to element due to page overflow:", child);
-            console.log("Element content:", child.innerHTML);
-
-            // Reset cumulative height for the next page
-            cumulativeHeight = childHeight + 20; // Start with the current element's height and top padding
-        }
-    });
+    const BOTTOM_PADDING = 10; // Bottom padding in mm
+    const AVAILABLE_HEIGHT = PAGE_HEIGHT - TOP_PADDING - BOTTOM_PADDING;
 
     // Initialize jsPDF
     const { jsPDF } = window.jspdf;
@@ -2982,6 +3094,29 @@
         unit: "mm",
         format: "a4",
     });
+
+    let currentHeight = TOP_PADDING; // Start with top padding
+
+    // Function to add a new page with top padding
+    function addNewPage() {
+        pdf.addPage();
+        currentHeight = TOP_PADDING; // Reset height for the new page
+    }
+
+    // Function to add content with padding
+    function addContent(content, height) {
+        if (currentHeight + height > AVAILABLE_HEIGHT) {
+            // Add bottom padding to the current page
+            pdf.text("", 10, PAGE_HEIGHT - BOTTOM_PADDING);
+
+            // Add a new page with top padding
+            addNewPage();
+        }
+
+        // Add content to the current page
+        pdf.text(content, 10, currentHeight);
+        currentHeight += height;
+    }
 
     // Convert HTML to PDF
     pdf.html(pageElement, {
@@ -3001,7 +3136,6 @@
         windowWidth: 800,
     });
 }
-
     // Attach the saveAsPDF function to a button click event
     document.getElementById('download-pdf').addEventListener('click', saveAsPDF);
 
@@ -3385,7 +3519,6 @@
         newDegree.innerHTML = `
             <div style="display: flex;">
                 <p id="editable-text" class="editable-text placeholder" data-placeholder="[Degree Name]" contenteditable="true">[Degree Name]</p>
-                <button class="add-button1" data-tooltip="Add Major & CGPA" onclick="addMajorCGPA(${universityId}, ${newDegreeId})"><i class="bi bi-plus-circle"></i></button>
                 <button class="remove-button1" data-tooltip="Remove Degree" onclick="removeDegree(${universityId}, ${newDegreeId})"><i class="bi bi-x-circle"></i></button>             
             </div>
         `;
@@ -3401,42 +3534,6 @@
         const degreeElement = document.getElementById(`degree${universityId}${degreeId}`);
         if (degreeElement) {
             degreeElement.remove();
-            attachEditableEvents(); // Reattach listeners to new elements
-            runPaginationLogic();
-            savePageContent(); // Save changes to the page
-        }
-    }
-
-    // Add Major and CGPA fields to a specific degree
-    function addMajorCGPA(universityId, degreeId) {
-        const degreeElement = document.getElementById(`degree${universityId}${degreeId}`);
-        const existingMajorCgpa = degreeElement.querySelector(`#majorCgpa${universityId}${degreeId}`);
-
-        // Prevent adding duplicate Major & CGPA fields
-        if (existingMajorCgpa) return;
-
-        const majorCgpaContainer = document.createElement('div');
-        majorCgpaContainer.id = `majorCgpa${universityId}${degreeId}`;
-        majorCgpaContainer.className = 'major-cgpa-content';
-        majorCgpaContainer.innerHTML = `
-            <div style="display: flex;">
-                <p id="editable-text" class="editable-text placeholder" data-placeholder="Major: [Field/Focus], Minor: [Field/Focus]" contenteditable="true">Major: [Field/Focus], Minor: [Field/Focus]</p>
-                <button class="remove-button12" data-tooltip="Remove Major & CGPA" onclick="removeMajorCGPA(${universityId}, ${degreeId})"><i class="bi bi-x-circle"></i></button>
-            </div>
-            <p id="editable-text" class="editable-text placeholder" data-placeholder="CGPA: [CGPA]" contenteditable="true">CGPA: [CGPA]</p>
-        `;
-
-        degreeElement.appendChild(majorCgpaContainer);
-        attachEditableEvents(); // Reattach listeners to new elements
-        runPaginationLogic();
-        savePageContent(); // Save changes to the page
-    }
-
-    // Remove Major and CGPA fields
-    function removeMajorCGPA(universityId, degreeId) {
-        const majorCgpaElement = document.getElementById(`majorCgpa${universityId}${degreeId}`);
-        if (majorCgpaElement) {
-            majorCgpaElement.remove(); // Remove the section from the DOM
             attachEditableEvents(); // Reattach listeners to new elements
             runPaginationLogic();
             savePageContent(); // Save changes to the page
